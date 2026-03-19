@@ -1,0 +1,2 @@
+# fokonyvi
+fokönyvi kivonat elemzés
