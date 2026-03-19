@@ -220,6 +220,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
     <div class="field-hint">A kulcs csak a böngésződben tárolódik, a szerverre nem kerül fel. Igényelni: console.anthropic.com</div>
   </div>
 
+  <div class="field-box">
+    <label class="field-label">Könyvelői megjegyzések <span style="font-weight:400;color:var(--txs)">(nem kötelező)</span></label>
+    <textarea class="field-input" id="notes" rows="5" placeholder="Kétféle információt írhatsz ide:
+
+1. Kontextus, amit a főkönyvből nem látok:
+   • Az egyéb bevétel GINOP pályázatból származik
+   • A 30 M Ft kölcsönt a tulajdonos kapta, visszafizetés 2026 Q1-ben várható
+   • A magas házipénztár az ügyfél kérésére, készpénzes forgalom miatt szükséges
+
+2. Az ügyfél pénzügyi ismeretei / stílus:
+   • Az ügyfél pénzügyileg képzett, szakmai fogalmak használhatók
+   • Az ügyfél nem ért a pénzügyekhez, kerüljük a szakzsargont, hétköznapi példákkal magyarázz
+   • Az összefoglaló a cég tulajdonosának szól, tömör és lényegre törő legyen" style="resize:vertical;line-height:1.6;font-size:13px"></textarea>
+    <div class="field-hint">A megjegyzések beépülnek az ügyfél-összefoglalóba, a megfelelő szakaszoknál jelennek meg.</div>
+  </div>
+
   <div class="btn-row">
     <button class="btn-primary" onclick="startAnalysis()">Elemzés indítása →</button>
   </div>
@@ -311,7 +327,8 @@ async function startAnalysis() {
     const base64 = await toBase64(currentFile);
     setStep(1, 'done'); setStep(2, 'active');
 
-    const prompt = buildPrompt();
+    const notes = document.getElementById('notes').value;
+    const prompt = buildPrompt(notes);
     setStep(2, 'done'); setStep(3, 'active');
 
     const ext = currentFile.name.split('.').pop().toLowerCase();
@@ -375,8 +392,11 @@ function toBase64(file) {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function buildPrompt() {
-  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.
+function buildPrompt(notes) {
+  const notesSection = notes && notes.trim()
+    ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — kötelező figyelembe venni:\n${notes.trim()}\nFontos: ha a megjegyzés az ügyfél pénzügyi ismereteire vagy a kívánt stílusra vonatkozik (pl. "szakmai fogalmak használhatók" vagy "kerüljük a szakzsargont"), azt az ÖSSZES szövegmezőre alkalmazd. Ha kontextuális információ (pl. bevétel forrása, kölcsön részletei), azt a megfelelő szakasznál építsd be tárgyilagosan.\n`
+    : '';
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.${notesSection}
 
 FONTOS SZABÁLYOK a szövegezéshez:
 - Minden magyarázat tárgyilagos és tényszerű legyen
@@ -738,7 +758,7 @@ function resetApp() {
   document.getElementById('uz-hint').textContent = 'vagy húzd rá a fájlt';
   document.getElementById('error-msg').style.display = 'none';
   document.getElementById('client-preview').innerHTML = '';
-  document.getElementById('file-input').value = '';
+  document.getElementById('notes').value = '';
   setScreen('upload');
 }
 </script>
