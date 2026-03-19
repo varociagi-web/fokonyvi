@@ -430,50 +430,75 @@ Olvasd el a mellékelt főkönyvi kivonatot és add vissza KIZÁRÓLAG az alább
 NE adj hozzá semmilyen magyarázatot, megjegyzést vagy markdown jelölést — csak a feltöltött adatokat olvasd ki.
 
 A főkönyvi kivonatnak 4 oszlopa van: Forgalom Tartozik | Forgalom Követel | Egyenleg Tartozik | Egyenleg Követel.
-MINDEN értéknél az EGYENLEG oszlopot kell olvasni — NEM a Forgalom oszlopot!
+MINDEN értéknél KIZÁRÓLAG az EGYENLEG oszlopot olvasd — NEM a Forgalom oszlopot!
 
-Kérd vissza pontosan ezeket, minden sorhoz a TARTOZIK és KÖVETEL EGYENLEG értékét:
+FONTOS SZABÁLYOK:
+- A 81-es összesítő számla sok főkönyvben nem szerepel — helyette a 814 (ELÁBÉ) és 815 (közvetített) alszámlák vannak. Mindkettőt add meg külön!
+- A 466 (előzetesen felszámított ÁFA) és 467 (fizetendő ÁFA) és 468 (ÁFA elszámolás) NEM adótartozás — ezeket NE add meg a 46x adókötelezettségek közt, csak a lenti külön sorban!
+- A pénzeszközöknél (384) minden bankszámlát külön sorban adj meg névvel, beleértve a NEGATÍV egyenlegű hitelkereteket is!
+
+Kérd vissza pontosan ezeket (Tartozik egyenleg | Követel egyenleg):
 CÉG: (cég neve a fejlécből)
 ADÓSZÁM: (adószám)
 IDŐSZAK: (időszak a fejlécből)
 
-SZÁMLÁK EGYENLEGEI (Tartozik egyenleg | Követel egyenleg):
-91: | 
-93: | 
-96: | 
-97: | 
-51: | 
-52: | 
-53: | 
-54: | 
-55: | 
-57: | 
-81: | 
-815: | 
-86: | 
-87: | 
-89: | 
-311: | 
-316: | 
-317: | 
-381: | 
-382: | 
-384 (részletezve soronként): 
-389: | 
-454: | 
-452: | 
-461: | 
-462: | 
-463: | 
-465: | 
-466: | 
-467: | 
-469 (részletezve soronként): 
-471: | 
-473: | 
+BEVÉTELEK:
+91 (belföldi árbevétel): |
+93 (export árbevétel): |
+96 (egyéb bevételek): |
+97 (pénzügyi bevételek): |
+
+MŰKÖDÉSI KIADÁSOK (5-ös számlák egyenlege — TARTOZIK oldal):
+51 anyagköltség: |
+52 igénybe vett szolgáltatások: |
+53 egyéb szolgáltatások: |
+54 bérköltség: |
+55 személyi egyéb kifizetések: |
+56 bérjárulékok: |
+57 értékcsökkentés (ha szerepel az 5-ös közt): |
+
+RÁFORDÍTÁSOK (8-as számlák egyenlege — TARTOZIK oldal):
+814 ELÁBÉ (ha van ilyen alszámla): |
+815 közvetített szolgáltatások (ha van): |
+81 ELÁBÉ összesítő (csak ha nincs 814/815 alszámla): |
+86 egyéb ráfordítások: |
+87 pénzügyi ráfordítások: |
+89 KIVA vagy TAO: |
+
+VEVŐKÖVETELÉSEK (31-es számlák — TARTOZIK egyenleg):
+311 belföldi vevők: |
+312 belföldi devizás vevők: |
+316 külföldi vevők forint: |
+317 külföldi vevők deviza: |
+
+PÉNZESZKÖZÖK (38-as számlák — minden sort külön, névvel és egyenleggel, negatívot is!):
+381 pénztár: |
+382 valutapénztár: |
+384 bankszámlák (soronként, pl. OTP HUF: +X, Széchenyi hitelkeret: -Y):
+389 átvezetési számlák nettó: |
+
+KÖTELEZETTSÉGEK:
+454 szállítók: |
+452 rövid lejáratú hitelek: |
+
+ADÓKÖTELEZETTSÉGEK (csak tényleges adók — ÁFA számlák NEM szerepelnek itt!):
+461 TAO elszámolás: |
+462 SZJA: |
+463 ktgvetési befizetési kötelezettségek: |
+465 vám- és pénzügyőrség: |
+469 helyi iparűzési adó (részletezve, pl. HIPA Kulcs: X, HIPA Budapest: Y): 
+471 jövedelemadó elszámolás: |
+473 TB kötelezettség: |
+
+ÁFA SZÁMLÁK (külön csoportban — ezek NEM adótartozások!):
+466 előzetesen felszámított ÁFA: |
+467 fizetendő ÁFA: |
+468 ÁFA elszámolási számla: |
+4652 importbeszerzési ÁFA: |
 
 Ha egy számla nem szerepel a dokumentumban, írj 0-t.
-Az összegeket forintban add meg, szóközök és jelölések nélkül (pl: 10786747).`;
+Az összegeket forintban add meg, szóközök és jelölések nélkül (pl: 10786747).
+A negatív egyenleget negatív előjellel add meg (pl: -43939550).`;
 
     const extractResp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -675,7 +700,7 @@ JSON STRUKTÚRA:
     "penzeszkoz": "38-as számlacsoport EGYENLEG — pénztár+valuta+bankok NETTÓ értéke (lehet negatív!)",
     "vevo_kovetel": "31-es számlák EGYENLEG összesítve (311+312+316+317)",
     "szallito_tar": "454-es számla EGYENLEG KÖVETEL értéke",
-    "nav_tartozas": "46-os számlacsoport adójellegű kötelezettségeinek összege (462+463+465+467+469 stb.)",
+    "nav_tartozas": "CSAK tényleges adókötelezettségek: 461+462+463+465+471+473 számlák egyenlege összesítve — a 466 ÁFA, 467 fizetendő ÁFA, 468 ÁFA elszámolás NEM tartozik ide!",
     "kiva_osszeg": "89-es számla (KIVA) EGYENLEG TARTOZIK értéke",
     "hipa_osszeg": "469-es számlacsoport EGYENLEG TARTOZIK értéke összesítve",
     "osszes_ado": "kiva_osszeg + hipa_osszeg"
