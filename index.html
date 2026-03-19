@@ -283,11 +283,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
 <div id="screen-processing">
   <div class="spinner"></div>
   <div class="proc-title">Elemzés folyamatban…</div>
-  <p class="proc-sub">A Claude AI olvassa a főkönyvi kivonatot és generálja a magyarázatokat.</p>
+  <p class="proc-sub">A Claude AI kétlépéses ellenőrzéssel dolgozza fel a dokumentumokat.</p>
   <div class="steps">
     <div class="step active" id="ps1"><div class="step-dot"></div>PDF beolvasása</div>
-    <div class="step" id="ps2"><div class="step-dot"></div>Adatok kinyerése</div>
-    <div class="step" id="ps3"><div class="step-dot"></div>Magyarázatok generálása</div>
+    <div class="step" id="ps2"><div class="step-dot"></div>Számlaszámok kinyerése (1. lépés)</div>
+    <div class="step" id="ps3"><div class="step-dot"></div>Elemzés és magyarázatok (2. lépés)</div>
     <div class="step" id="ps4"><div class="step-dot"></div>Összefoglaló összeállítása</div>
   </div>
 </div>
@@ -423,23 +423,96 @@ async function startAnalysis() {
     const hasComparison = !!currentFile2;
     const hasMonthly = !!currentFile3;
 
-    // Build main (főkönyv) message
-    let msgContent = [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }];
-    if (hasComparison) {
+    // ── 1. LÉPÉS: nyers adatkinyerés a főkönyvből ──────────────────────────
+    // Csak számokat kérünk, semmi értelmezés — így az oszlopok nem keverednek
+    const extractPrompt = `Te egy magyar könyvelő asszisztens vagy.
+Olvasd el a mellékelt főkönyvi kivonatot és add vissza KIZÁRÓLAG az alábbi számokat, pontosan ebben a formátumban.
+NE adj hozzá semmilyen magyarázatot, megjegyzést vagy markdown jelölést — csak a feltöltött adatokat olvasd ki.
+
+A főkönyvi kivonatnak 4 oszlopa van: Forgalom Tartozik | Forgalom Követel | Egyenleg Tartozik | Egyenleg Követel.
+MINDEN értéknél az EGYENLEG oszlopot kell olvasni — NEM a Forgalom oszlopot!
+
+Kérd vissza pontosan ezeket, minden sorhoz a TARTOZIK és KÖVETEL EGYENLEG értékét:
+CÉG: (cég neve a fejlécből)
+ADÓSZÁM: (adószám)
+IDŐSZAK: (időszak a fejlécből)
+
+SZÁMLÁK EGYENLEGEI (Tartozik egyenleg | Követel egyenleg):
+91: | 
+93: | 
+96: | 
+97: | 
+51: | 
+52: | 
+53: | 
+54: | 
+55: | 
+57: | 
+81: | 
+815: | 
+86: | 
+87: | 
+89: | 
+311: | 
+316: | 
+317: | 
+381: | 
+382: | 
+384 (részletezve soronként): 
+389: | 
+454: | 
+452: | 
+461: | 
+462: | 
+463: | 
+465: | 
+466: | 
+467: | 
+469 (részletezve soronként): 
+471: | 
+473: | 
+
+Ha egy számla nem szerepel a dokumentumban, írj 0-t.
+Az összegeket forintban add meg, szóközök és jelölések nélkül (pl: 10786747).`;
+
+    const extractResp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+          { type: 'text', text: extractPrompt }
+        ]}]
+      })
+    });
+    if (!extractResp.ok) { const err = await extractResp.json(); throw new Error(err.error?.message || 'Adatkinyerési API hiba'); }
+    const extractResult = await extractResp.json();
+    const rawNumbers = extractResult.content[0].text;
+
+    // ── 2. LÉPÉS: JSON generálás a kinyert számokból + az eredeti PDF-ből ──
+    // Az előző lépés eredményét szövegként adjuk át — így a számok már ellenőrzöttek
+    const hasComp2 = hasComparison;
+    let msgContent = [
+      { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+      { type: 'text', text: `Az előző lépésben egy másik AI-hívás már kinyerte a főkönyv számlaszámait és egyenlegeit. Az eredmény:\n\n${rawNumbers}\n\nEzeket az adatokat használd a JSON generálásához — ha eltérést látsz a PDF-ben és a fenti számokban, a fenti számokat fogadd el.\n\n` + buildPromptFokonyv(notes, hasComp2) }
+    ];
+    if (hasComp2) {
       const base64b = await toBase64(currentFile2);
-      msgContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64b } });
-      msgContent.push({ type: 'text', text: 'Az első dokumentum az aktuális időszak főkönyve, a második az előző időszaké. ' + buildPromptFokonyv(notes, true) });
-    } else {
-      msgContent.push({ type: 'text', text: buildPromptFokonyv(notes, false) });
+      msgContent = [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64b } },
+        { type: 'text', text: `Az előző lépésben kinyert számok az aktuális főkönyvből:\n\n${rawNumbers}\n\nAz első dokumentum az aktuális időszak főkönyve, a második az előző időszaké. ` + buildPromptFokonyv(notes, true) }
+      ];
     }
 
     setStep(2,'done'); setStep(3,'active');
 
-    // Run main analysis + optional monthly analysis in parallel
     const mainPromise = fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3500, messages: [{ role: 'user', content: msgContent }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: msgContent }] })
     });
 
     let monthlyPromise = null;
