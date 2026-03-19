@@ -495,24 +495,33 @@ async function startAnalysis() {
     currentData = JSON.parse(mainMatch[0]);
 
     if (monthlyResp) {
-      if (!monthlyResp.ok) { const err = await monthlyResp.json(); throw new Error(err.error?.message || 'Havi kimutatás API hiba'); }
-      const monthlyResult = await monthlyResp.json();
-      const monthlyMatch = monthlyResult.content[0].text.match(/\{[\s\S]*\}/);
-      if (monthlyMatch) currentData._havi = JSON.parse(monthlyMatch[0]);
+      try {
+        if (monthlyResp.ok) {
+          const monthlyResult = await monthlyResp.json();
+          const monthlyMatch = monthlyResult.content[0].text.match(/\{[\s\S]*\}/);
+          if (monthlyMatch) currentData._havi = JSON.parse(monthlyMatch[0]);
+        }
+      } catch(e) { console.warn('Havi kimutatás feldolgozása sikertelen:', e); }
     }
 
     if (vevoResp) {
-      if (!vevoResp.ok) { const err = await vevoResp.json(); throw new Error(err.error?.message || 'Vevő API hiba'); }
-      const vevoResult = await vevoResp.json();
-      const vevoMatch = vevoResult.content[0].text.match(/\{[\s\S]*\}/);
-      if (vevoMatch) currentData._vevo = JSON.parse(vevoMatch[0]);
+      try {
+        if (vevoResp.ok) {
+          const vevoResult = await vevoResp.json();
+          const vevoMatch = vevoResult.content[0].text.match(/\{[\s\S]*\}/);
+          if (vevoMatch) currentData._vevo = JSON.parse(vevoMatch[0]);
+        }
+      } catch(e) { console.warn('Vevő feldolgozása sikertelen:', e); }
     }
 
     if (szallitoResp) {
-      if (!szallitoResp.ok) { const err = await szallitoResp.json(); throw new Error(err.error?.message || 'Szállító API hiba'); }
-      const szallitoResult = await szallitoResp.json();
-      const szallitoMatch = szallitoResult.content[0].text.match(/\{[\s\S]*\}/);
-      if (szallitoMatch) currentData._szallito = JSON.parse(szallitoMatch[0]);
+      try {
+        if (szallitoResp.ok) {
+          const szallitoResult = await szallitoResp.json();
+          const szallitoMatch = szallitoResult.content[0].text.match(/\{[\s\S]*\}/);
+          if (szallitoMatch) currentData._szallito = JSON.parse(szallitoMatch[0]);
+        }
+      } catch(e) { console.warn('Szállító feldolgozása sikertelen:', e); }
     }
 
     setStep(3,'done'); setStep(4,'active');
@@ -1248,7 +1257,6 @@ function renderReport(d) {
   <div id="c1" class="cr-sec on">
     <div class="cr-sec-title"><span class="cr-sec-num">1</span>Az időszak röviden</div>
     <div class="ins info">${s.osszesito || '—'}</div>
-    <div class="ins info">${s.bevetelek || '—'}</div>
     <div class="cg">
       <div class="cb"><div class="cb-title">Bevétel és kiadás</div><div class="cb-sub">${idoszakLabel}</div><div style="position:relative;height:200px"><canvas id="cv1"></canvas></div></div>
       <div class="cb"><div class="cb-title">Bevétel → Kiadás → Eredmény</div><div class="cb-sub">Hogyan keletkezett a nyereség?</div><div style="position:relative;height:200px"><canvas id="cv2"></canvas></div></div>
@@ -1259,9 +1267,9 @@ function renderReport(d) {
     <div class="cr-sec-title"><span class="cr-sec-num">2</span>Eredmény és bevételek</div>
     <div class="mc-row">
       <div class="mc"><div class="mc-lbl">Értékesítés árbevétele</div><div class="mc-val pos">${fmtM(k.arbevetal)}</div></div>
-      <div class="mc"><div class="mc-lbl">Egyéb bevételek</div><div class="mc-val pos">${fmtM(k.egyeb_bevetel)}</div><div class="mc-sub">támogatás, kártérítés</div></div>
+      <div class="mc"><div class="mc-lbl">Egyéb bevételek</div><div class="mc-val ${k.egyeb_bevetel>0?'pos':''}">${fmtM(k.egyeb_bevetel)||'—'}</div><div class="mc-sub">egyéb + pénzügyi</div></div>
       <div class="mc"><div class="mc-lbl">Adózás előtti eredmény</div><div class="mc-val ${k.eredmeny>=0?'pos':'neg'}">${fmtM(k.eredmeny)}</div><div class="mc-sub">${marzs}% a bevételből</div></div>
-      <div class="mc"><div class="mc-lbl">Adóterhelés</div><div class="mc-val neg">${fmtM(k.kiva_osszeg||k.osszes_ado)}</div></div>
+      <div class="mc"><div class="mc-lbl">Adóterhelés</div><div class="mc-val neg">${fmtM(k.osszes_ado)}</div><div class="mc-sub">${d.adoalany_tipusa || 'KIVA'} + HIPA</div></div>
     </div>
     <div class="ins info">${s.bevetelek || '—'}</div>
     ${s.arfolyam ? `<div class="ins info">${s.arfolyam}</div>` : ''}
@@ -1270,7 +1278,7 @@ function renderReport(d) {
   <div id="c3" class="cr-sec">
     <div class="cr-sec-title"><span class="cr-sec-num">3</span>Kiadások részletezve</div>
     <div class="ins info">${s.koltsegek || '—'}</div>
-    <div class="ins info">${s.berzkoltseg || '—'}</div>
+    <div class="ins info">${s.berkoltseg || '—'}</div>
     <div class="cg">
       <div class="cb"><div class="cb-title">Kiadások megoszlása</div><div class="cb-sub">Arányos megjelenítés</div><div style="position:relative;height:210px"><canvas id="cv3"></canvas></div></div>
       <div class="cb"><div class="cb-title">Kiadástételek</div><div class="cb-sub">Összegek és arányok</div>${koltBars}</div>
@@ -1280,10 +1288,10 @@ function renderReport(d) {
   <div id="c4" class="cr-sec">
     <div class="cr-sec-title"><span class="cr-sec-num">4</span>Pénzügyi helyzet</div>
     <div class="mc-row">
-      <div class="mc"><div class="mc-lbl">Összes pénzeszköz</div><div class="mc-val pos">${fmtM(k.penzeszkoz)}</div></div>
+      <div class="mc"><div class="mc-lbl">Összes pénzeszköz</div><div class="mc-val ${k.penzeszkoz>=0?'pos':'neg'}">${fmtM(k.penzeszkoz)}</div></div>
       <div class="mc"><div class="mc-lbl">Vevőkövetelés</div><div class="mc-val">${fmtM(k.vevo_kovetel)}</div><div class="mc-sub">beérkező összeg</div></div>
-      <div class="mc"><div class="mc-lbl">Szállítói tartozás</div><div class="mc-val neg">${fmtM(k.szallito_tar)}</div><div class="mc-sub">fizetendő összeg</div></div>
-      <div class="mc"><div class="mc-lbl">NAV-tartozás</div><div class="mc-val neg">${fmtM(k.nav_tartozas)}</div></div>
+      <div class="mc"><div class="mc-lbl">Szállítói tartozás</div><div class="mc-val ${k.szallito_tar>0?'neg':''}">${fmtM(k.szallito_tar)||'—'}</div><div class="mc-sub">fizetendő összeg</div></div>
+      ${k.nav_tartozas>0 ? `<div class="mc"><div class="mc-lbl">NAV-tartozás</div><div class="mc-val neg">${fmtM(k.nav_tartozas)}</div></div>` : ''}
     </div>
     <div class="ins info">${s.penz_helyzet || '—'}</div>
     <div class="ins info">${s.liq_reszlet || '—'}</div>
@@ -1315,9 +1323,9 @@ function renderReport(d) {
     <div class="ins purple">Az időszakban a cég összesen <b>${fmtM(k.osszes_ado)}</b> adót fizetett különböző jogcímeken — ez az összes bevétel ${pct(k.osszes_ado, osszesBev)}-a. Az alábbiakban ez tételesen szerepel.</div>
 
     <div class="ado-card">
-      <div class="ado-card-title">KIVA — Kisvállalati adó <span class="ado-badge">${d.adoalany_tipusa || 'KIVA'}-alany</span></div>
-      <div class="ado-card-sub">Összevont adónem — a TAO és SZOCHO helyett fizetendő</div>
-      <div class="ado-row"><span class="ado-row-lbl">Könyvelésben elszámolt KIVA-ráfordítás</span><span class="ado-row-val">${fmtM(k.kiva_osszeg)}</span></div>
+      <div class="ado-card-title">${d.adoalany_tipusa==='TAO'?'Társasági adó (TAO)':'KIVA — Kisvállalati adó'} <span class="ado-badge">${d.adoalany_tipusa || 'KIVA'}-alany</span></div>
+      <div class="ado-card-sub">${d.adoalany_tipusa==='TAO'?'A nyereség 9%-a az adóalap után':'Összevont adónem — a TAO és SZOCHO helyett fizetendő'}</div>
+      <div class="ado-row"><span class="ado-row-lbl">Könyvelésben elszámolt ${d.adoalany_tipusa==='TAO'?'TAO':'KIVA'}-ráfordítás</span><span class="ado-row-val">${fmtM(k.kiva_osszeg)}</span></div>
       <div class="ins purple" style="margin-bottom:0;margin-top:.75rem">${s.kiva_magyarazat || '—'}</div>
     </div>
 
