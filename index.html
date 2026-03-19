@@ -381,15 +381,17 @@ function buildPrompt() {
 FONTOS SZABÁLYOK a szövegezéshez:
 - Minden magyarázat tárgyilagos és tényszerű legyen
 - Ne használj minősítő jelzőket (pl. "egészséges", "kedvező", "kiemelkedő", "szilárd")
-- Csak számokat, arányokat, definíciókat és összefüggéseket írj
+- Csak számokat, arányokat, tényeket és összefüggéseket írj
 - A szöveg laikusok számára is érthető legyen, de szakmailag pontos
-- A HIPA (helyi iparűzési adó) alapja a KIVA-alap 120%-a — ezt vedd figyelembe
+- A HIPA-nál NE írd le a számítási módszert — csak a tényleges számokat közöld (kötelezettség, befizetett előleg, fennálló egyenleg önkormányzatonként)
+- A HIPA alapjának kiszámítása a bevallásból derül ki, a főkönyvből nem olvasható ki egyértelműen — ezért erről ne írj semmit
 
 JSON STRUKTÚRA:
 {
   "ceg": "cég teljes neve",
   "adoszam": "adószám",
   "idoszak": "pl. 2025. január 1. – december 31.",
+  "adoalany_tipusa": "KIVA vagy TAO vagy egyéb — a főkönyvi számlákból azonosítva",
   "kpi": {
     "arbevetal": 0,
     "egyeb_bevetel": 0,
@@ -401,8 +403,7 @@ JSON STRUKTÚRA:
     "nav_tartozas": 0,
     "kiva_osszeg": 0,
     "hipa_osszeg": 0,
-    "osszes_ado": 0,
-    "kiva_alap": 0
+    "osszes_ado": 0
   },
   "koltsegek": [
     {"nev": "Közvetített szolgáltatás", "osszeg": 0},
@@ -410,7 +411,7 @@ JSON STRUKTÚRA:
     {"nev": "Bérköltség", "osszeg": 0},
     {"nev": "Igénybe vett szolgáltatások", "osszeg": 0},
     {"nev": "Értékcsökkentés", "osszeg": 0},
-    {"nev": "KIVA adó", "osszeg": 0},
+    {"nev": "KIVA / TAO adó", "osszeg": 0},
     {"nev": "Egyéb ráfordítások", "osszeg": 0}
   ],
   "penzeszk": [
@@ -420,19 +421,19 @@ JSON STRUKTÚRA:
     {"nev": "Egyéb", "osszeg": 0}
   ],
   "hipa_telephelyek": [
-    {"nev": "Telephely neve", "kotelezettseg": 0, "eloleleg": 0, "egyenleg": 0}
+    {"nev": "Telephely / önkormányzat neve", "kotelezettseg": 0, "eloleleg": 0, "egyenleg": 0}
   ],
   "szoveg": {
     "osszesito": "2-3 tárgyilagos mondat az év számairól. Konkrét összegek és arányok.",
     "bevetelek": "A bevételek összetételének tárgyilagos leírása — mi az alaptevékenység, van-e egyéb bevétel, támogatás.",
-    "arfolyam": "Ha volt árfolyamhatás, annak tárgyilagos ismertetése. Ha nem volt, hagyd üresen.",
+    "arfolyam": "Ha volt árfolyamhatás, annak tárgyilagos ismertetése számokkal. Ha nem volt, hagyd üresen (üres string).",
     "koltsegek": "A legnagyobb kiadástételek tárgyilagos ismertetése és definíciója.",
-    "berzkoltseg": "A személyi jellegű kiadások összetételének tárgyilagos leírása.",
+    "berkoltseg": "A személyi jellegű kiadások összetételének tárgyilagos leírása számokkal.",
     "penz_helyzet": "A pénzeszközök és a vevő/szállító egyenleg tárgyilagos ismertetése számokkal.",
-    "liq_reszlet": "A likviditási ráta értéke és definíciója (forgóeszköz / rövid lej. kötelezettség).",
-    "kiva_magyarazat": "A KIVA mechanizmusának tárgyilagos leírása: mi az adóalap, mi a kulcs, mit vált ki.",
-    "hipa_magyarazat": "A HIPA számításának tárgyilagos leírása: alap = KIVA-alap × 1,2, önkormányzatonként eltérő kulcs.",
-    "ado_osszegzes": "Az összes adóteher arányának tárgyilagos közlése a bevételhez képest."
+    "liq_reszlet": "A likviditási ráta értéke és definíciója: forgóeszközök osztva rövid lejáratú kötelezettségekkel.",
+    "kiva_magyarazat": "Ha KIVA-alany: a KIVA mechanizmusának tárgyilagos leírása — mi az adóalap, mi a kulcs, mit vált ki a TAO és SZOCHO helyett. Ha nem KIVA-alany: a tényleges adónem leírása.",
+    "hipa_magyarazat": "A helyi iparűzési adó tárgyilagos ismertetése: mi ez az adónem, ki veti ki, mikor esedékes. NE szerepeljen benne semmilyen számítási módszer vagy formula.",
+    "ado_osszegzes": "Az összes adóteher összegének és a bevételhez viszonyított arányának tárgyilagos közlése."
   }
 }`;
 }
@@ -478,9 +479,6 @@ function renderReport(d) {
       <div class="hipa-val">${fmtM(h.egyenleg)}</div>
       <div class="hipa-sub">fennálló egyenleg</div>
     </div>`).join('')}</div>` : '';
-
-  const kivaAlap = k.kiva_alap || 0;
-  const hipaAlap = Math.round(kivaAlap * 1.2);
 
   const html = `<div class="cr-wrap">
   <div class="cr-hdr">
@@ -581,27 +579,16 @@ function renderReport(d) {
     <div class="ins purple">Az év során a cég összesen <b>${fmtM(k.osszes_ado)}</b> adót fizetett különböző jogcímeken — ez a bevétel ${pct(k.osszes_ado, k.arbevetal)}-a. Az alábbiakban ez tételesen szerepel.</div>
 
     <div class="ado-card">
-      <div class="ado-card-title">KIVA — Kisvállalati adó <span class="ado-badge">Nyereség- és béralapú adó</span></div>
-      <div class="ado-card-sub">A cég KIVA-alany — ez egy összevont adónem kkv-k számára</div>
-      <div class="kiva-calc">
-        <div class="kiva-calc-title">A KIVA kiszámítása</div>
-        <div class="kiva-sor"><span>KIVA-alap (személyi kifizetések + tőkekivonás)</span><span>${fmtM(kivaAlap)}</span></div>
-        <div class="kiva-sor"><span>KIVA kulcs</span><span>10%</span></div>
-        <div class="kiva-sor"><span>Könyvelésben elszámolt KIVA-ráfordítás</span><span>${fmtM(k.kiva_osszeg)}</span></div>
-      </div>
-      <div class="ins purple" style="margin-bottom:0">${s.kiva_magyarazat || '—'}</div>
+      <div class="ado-card-title">KIVA — Kisvállalati adó <span class="ado-badge">${d.adoalany_tipusa || 'KIVA'}-alany</span></div>
+      <div class="ado-card-sub">Összevont adónem — a TAO és SZOCHO helyett fizetendő</div>
+      <div class="ado-row"><span class="ado-row-lbl">Könyvelésben elszámolt KIVA-ráfordítás</span><span class="ado-row-val">${fmtM(k.kiva_osszeg)}</span></div>
+      <div class="ins purple" style="margin-bottom:0;margin-top:.75rem">${s.kiva_magyarazat || '—'}</div>
     </div>
 
     <div class="ado-card">
       <div class="ado-card-title">Helyi iparűzési adó (HIPA) <span class="ado-badge">Önkormányzati adó</span></div>
-      <div class="ado-card-sub">Az adó alapja a KIVA-alap 120%-a, az adókulcsot az önkormányzat határozza meg</div>
+      <div class="ado-card-sub">Önkormányzatonként külön kivetett adó a tevékenység helye szerint</div>
       ${hipaCards}
-      <div class="kiva-calc">
-        <div class="kiva-calc-title">A HIPA alapjának levezetése</div>
-        <div class="kiva-sor"><span>KIVA-alap</span><span>${fmtM(kivaAlap)}</span></div>
-        <div class="kiva-sor"><span>HIPA-alap (KIVA-alap × 1,2)</span><span>${fmtM(hipaAlap)}</span></div>
-        <div class="kiva-sor"><span>Adókulcs (önkormányzatonként eltérő)</span><span>lásd telephely</span></div>
-      </div>
       ${hipaTelephelyek ? `<div style="margin-bottom:.75rem">${hipaTelephelyek}</div>` : ''}
       <div class="ins purple" style="margin-bottom:0">${s.hipa_magyarazat || '—'}</div>
     </div>
