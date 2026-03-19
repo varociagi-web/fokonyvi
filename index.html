@@ -202,17 +202,64 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
 <!-- UPLOAD -->
 <div id="screen-upload">
   <div class="upload-headline">Főkönyvi kivonat elemzése</div>
-  <p class="upload-sub">Töltsd fel az ügyfél PDF-jét. A rendszer feldolgozza és elkészíti a laikusok számára is érthető ügyfél-összefoglalót.</p>
+  <p class="upload-sub">Töltsd fel az ügyfél dokumentumait. Csak a főkönyvi kivonat kötelező — a többi opcionális, de gazdagabb összefoglalót eredményez.</p>
 
-  <div class="upload-zone" id="dropzone" onclick="document.getElementById('file-input').click()">
-    <div class="uz-icon">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9,15 12,12 15,15"/></svg>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--txm);margin-bottom:6px">Főkönyvi kivonat <span style="color:var(--tl5)">*</span></div>
+      <div class="upload-zone" id="dropzone" onclick="document.getElementById('file-input').click()">
+        <div class="uz-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9,15 12,12 15,15"/></svg></div>
+        <div class="uz-title" id="uz-title">Kattints ide</div>
+        <div class="uz-hint" id="uz-hint">vagy húzd rá</div>
+        <div class="uz-formats"><span class="uz-fmt">PDF</span><span class="uz-fmt">XLSX</span></div>
+        <input type="file" id="file-input" accept=".pdf,.xlsx,.xls">
+      </div>
     </div>
-    <div class="uz-title" id="uz-title">Kattints ide a feltöltéshez</div>
-    <div class="uz-hint" id="uz-hint">vagy húzd rá a fájlt</div>
-    <div class="uz-formats"><span class="uz-fmt">PDF</span><span class="uz-fmt">XLSX</span></div>
-    <input type="file" id="file-input" accept=".pdf,.xlsx,.xls">
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--txm);margin-bottom:6px">Előző időszak <span style="color:var(--txs);font-weight:400">(összehasonlításhoz)</span></div>
+      <div class="upload-zone" id="dropzone2" onclick="document.getElementById('file-input2').click()" style="border-style:dashed;opacity:.75">
+        <div class="uz-icon" style="background:var(--br0)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9,15 12,12 15,15"/></svg></div>
+        <div class="uz-title" id="uz-title2" style="font-size:13px">Előző főkönyv</div>
+        <div class="uz-hint" id="uz-hint2">opcionális</div>
+        <div class="uz-formats"><span class="uz-fmt">PDF</span></div>
+        <input type="file" id="file-input2" accept=".pdf">
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--txm);margin-bottom:6px">Havi eredménykimutatás <span style="color:var(--txs);font-weight:400">(havi fülhöz)</span></div>
+      <div class="upload-zone" id="dropzone3" onclick="document.getElementById('file-input3').click()" style="border-style:dashed;opacity:.75">
+        <div class="uz-icon" style="background:var(--br0)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+        <div class="uz-title" id="uz-title3" style="font-size:13px">Havi kimutatás</div>
+        <div class="uz-hint" id="uz-hint3">opcionális</div>
+        <div class="uz-formats"><span class="uz-fmt">PDF</span></div>
+        <input type="file" id="file-input3" accept=".pdf">
+      </div>
+    </div>
   </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0">
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--txm);margin-bottom:6px">Vevőkövetelések nyilvántartása <span style="color:var(--txs);font-weight:400">(vevő fülhöz)</span></div>
+      <div class="upload-zone" id="dropzone4" onclick="document.getElementById('file-input4').click()" style="border-style:dashed;opacity:.75;padding:1.5rem 1rem">
+        <div class="uz-icon" style="background:#E6F1FB;width:42px;height:42px"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#185FA5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div class="uz-title" id="uz-title4" style="font-size:13px;color:#185FA5">Vevő nyilvántartás</div>
+        <div class="uz-hint" id="uz-hint4">opcionális</div>
+        <div class="uz-formats"><span class="uz-fmt" style="background:#E6F1FB;color:#185FA5;border-color:#B5D4F4">PDF</span></div>
+        <input type="file" id="file-input4" accept=".pdf">
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--txm);margin-bottom:6px">Szállítói nyilvántartás <span style="color:var(--txs);font-weight:400">(szállító fülhöz)</span></div>
+      <div class="upload-zone" id="dropzone5" onclick="document.getElementById('file-input5').click()" style="border-style:dashed;opacity:.75;padding:1.5rem 1rem">
+        <div class="uz-icon" style="background:#FAECE7;width:42px;height:42px"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#8B4513"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16 16,8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+        <div class="uz-title" id="uz-title5" style="font-size:13px;color:#8B4513">Szállító nyilvántartás</div>
+        <div class="uz-hint" id="uz-hint5">opcionális</div>
+        <div class="uz-formats"><span class="uz-fmt" style="background:#FAECE7;color:#8B4513;border-color:#F5C4B3">PDF</span></div>
+        <input type="file" id="file-input5" accept=".pdf">
+      </div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--txs);margin-top:6px;margin-bottom:1.25rem">A vevő/szállító nyilvántartás feltöltésével partnerenként összesített, lejárt/folyó státuszú fül jelenik meg az összefoglalóban.</p>
 
   <div class="field-box">
     <label class="field-label">Anthropic API kulcs</label>
@@ -255,9 +302,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         HTML letöltése
       </button>
-      <button class="btn-print" onclick="window.print()">
+      <button class="btn-print" onclick="openPrintView()">
         <svg viewBox="0 0 24 24"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Nyomtatás
+        Nyomtatási nézet
       </button>
     </div>
   </div>
@@ -267,28 +314,84 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 let currentData = null;
+let currentData2 = null;
 let currentFile = null;
+let currentFile2 = null;
+let currentFile3 = null;
+let currentFile4 = null;
+let currentFile5 = null;
 let currentFilename = '';
 
-// Drag & drop
+// Drop zone 1
 const dz = document.getElementById('dropzone');
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
 dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); setFile(e.dataTransfer.files[0]); });
 document.getElementById('file-input').addEventListener('change', e => setFile(e.target.files[0]));
 
+// Drop zone 2
+const dz2 = document.getElementById('dropzone2');
+dz2.addEventListener('dragover', e => { e.preventDefault(); dz2.classList.add('drag'); });
+dz2.addEventListener('dragleave', () => dz2.classList.remove('drag'));
+dz2.addEventListener('drop', e => { e.preventDefault(); dz2.classList.remove('drag'); setFile2(e.dataTransfer.files[0]); });
+document.getElementById('file-input2').addEventListener('change', e => setFile2(e.target.files[0]));
+
+// Drop zone 3
+const dz3 = document.getElementById('dropzone3');
+dz3.addEventListener('dragover', e => { e.preventDefault(); dz3.classList.add('drag'); });
+dz3.addEventListener('dragleave', () => dz3.classList.remove('drag'));
+dz3.addEventListener('drop', e => { e.preventDefault(); dz3.classList.remove('drag'); setFile3(e.dataTransfer.files[0]); });
+document.getElementById('file-input3').addEventListener('change', e => setFile3(e.target.files[0]));
+
+// Drop zone 4 — vevő
+const dz4 = document.getElementById('dropzone4');
+dz4.addEventListener('dragover', e => { e.preventDefault(); dz4.classList.add('drag'); });
+dz4.addEventListener('dragleave', () => dz4.classList.remove('drag'));
+dz4.addEventListener('drop', e => { e.preventDefault(); dz4.classList.remove('drag'); setFile4(e.dataTransfer.files[0]); });
+document.getElementById('file-input4').addEventListener('change', e => setFile4(e.target.files[0]));
+
+// Drop zone 5 — szállító
+const dz5 = document.getElementById('dropzone5');
+dz5.addEventListener('dragover', e => { e.preventDefault(); dz5.classList.add('drag'); });
+dz5.addEventListener('dragleave', () => dz5.classList.remove('drag'));
+dz5.addEventListener('drop', e => { e.preventDefault(); dz5.classList.remove('drag'); setFile5(e.dataTransfer.files[0]); });
+document.getElementById('file-input5').addEventListener('change', e => setFile5(e.target.files[0]));
+
 function setFile(f) {
   if (!f) return;
-  currentFile = f;
-  currentFilename = f.name;
+  currentFile = f; currentFilename = f.name;
   document.getElementById('uz-title').textContent = '✓ ' + f.name;
   document.getElementById('uz-hint').textContent = 'Fájl betöltve';
+  dz.style.opacity = '1';
+}
+function setFile2(f) {
+  if (!f) return; currentFile2 = f;
+  document.getElementById('uz-title2').textContent = '✓ ' + f.name;
+  document.getElementById('uz-hint2').textContent = 'Betöltve';
+  dz2.style.opacity = '1';
+}
+function setFile3(f) {
+  if (!f) return; currentFile3 = f;
+  document.getElementById('uz-title3').textContent = '✓ ' + f.name;
+  document.getElementById('uz-hint3').textContent = 'Betöltve';
+  dz3.style.opacity = '1';
+}
+function setFile4(f) {
+  if (!f) return; currentFile4 = f;
+  document.getElementById('uz-title4').textContent = '✓ ' + f.name;
+  document.getElementById('uz-hint4').textContent = 'Betöltve';
+  dz4.style.opacity = '1';
+}
+function setFile5(f) {
+  if (!f) return; currentFile5 = f;
+  document.getElementById('uz-title5').textContent = '✓ ' + f.name;
+  document.getElementById('uz-hint5').textContent = 'Betöltve';
+  dz5.style.opacity = '1';
 }
 
 function showError(msg) {
   const el = document.getElementById('error-msg');
-  el.textContent = msg;
-  el.style.display = 'block';
+  el.textContent = msg; el.style.display = 'block';
 }
 
 function setScreen(s) {
@@ -297,74 +400,121 @@ function setScreen(s) {
   document.getElementById('screen-result').style.display = s === 'result' ? 'block' : 'none';
 }
 
-function setStep(n, state) {
-  document.getElementById('ps' + n).className = 'step ' + state;
-}
-
-function resetSteps() {
-  [1,2,3,4].forEach(n => document.getElementById('ps'+n).className = 'step');
-  setStep(1, 'active');
-}
+function setStep(n, state) { document.getElementById('ps' + n).className = 'step ' + state; }
+function resetSteps() { [1,2,3,4].forEach(n => document.getElementById('ps'+n).className = 'step'); setStep(1,'active'); }
 
 async function startAnalysis() {
   const apiKey = document.getElementById('api-key').value.trim();
   document.getElementById('error-msg').style.display = 'none';
   if (!apiKey) { showError('Add meg az Anthropic API kulcsot.'); return; }
-  if (!currentFile) { showError('Tölts fel egy PDF vagy Excel fájlt.'); return; }
-  setScreen('processing');
-  resetSteps();
+  if (!currentFile) { showError('Tölts fel egy főkönyvi kivonat PDF-et.'); return; }
+  setScreen('processing'); resetSteps();
   try {
     const base64 = await toBase64(currentFile);
-    setStep(1, 'done'); setStep(2, 'active');
+    setStep(1,'done'); setStep(2,'active');
 
     const notes = document.getElementById('notes').value;
-    const prompt = buildPrompt(notes);
-    setStep(2, 'done'); setStep(3, 'active');
+    const hasComparison = !!currentFile2;
+    const hasMonthly = !!currentFile3;
 
-    const ext = currentFile.name.split('.').pop().toLowerCase();
-    let msgContent;
-    if (ext === 'pdf') {
-      msgContent = [
-        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
-        { type: 'text', text: prompt }
-      ];
+    // Build main (főkönyv) message
+    let msgContent = [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }];
+    if (hasComparison) {
+      const base64b = await toBase64(currentFile2);
+      msgContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64b } });
+      msgContent.push({ type: 'text', text: 'Az első dokumentum az aktuális időszak főkönyve, a második az előző időszaké. ' + buildPromptFokonyv(notes, true) });
     } else {
-      msgContent = [{ type: 'text', text: prompt + '\n\nMegjegyzés: Excel fájl érkezett, de szövegként nem olvasható be. Kérlek generálj demo adatokat a struktúra bemutatásához.' }];
+      msgContent.push({ type: 'text', text: buildPromptFokonyv(notes, false) });
     }
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    setStep(2,'done'); setStep(3,'active');
+
+    // Run main analysis + optional monthly analysis in parallel
+    const mainPromise = fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2500,
-        messages: [{ role: 'user', content: msgContent }]
-      })
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3500, messages: [{ role: 'user', content: msgContent }] })
     });
 
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error?.message || 'API hiba (' + resp.status + ')');
+    let monthlyPromise = null;
+    if (hasMonthly) {
+      const base64m = await toBase64(currentFile3);
+      monthlyPromise = fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3000, messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64m } },
+          { type: 'text', text: buildPromptHavi() }
+        ]}]})
+      });
     }
 
-    const result = await resp.json();
-    const raw = result.content[0].text;
-    setStep(3, 'done'); setStep(4, 'active');
+    let vevoPromise = null;
+    if (currentFile4) {
+      const base64v = await toBase64(currentFile4);
+      vevoPromise = fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64v } },
+          { type: 'text', text: buildPromptPartner('vevo') }
+        ]}]})
+      });
+    }
 
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('Nem sikerült JSON választ kapni. Próbáld újra.');
-    currentData = JSON.parse(match[0]);
+    let szallitoPromise = null;
+    if (currentFile5) {
+      const base64s = await toBase64(currentFile5);
+      szallitoPromise = fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3000, messages: [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64s } },
+          { type: 'text', text: buildPromptPartner('szallito') }
+        ]}]})
+      });
+    }
 
-    setStep(4, 'done');
+    const [mainResp, monthlyResp, vevoResp, szallitoResp] = await Promise.all([
+      mainPromise,
+      monthlyPromise || Promise.resolve(null),
+      vevoPromise || Promise.resolve(null),
+      szallitoPromise || Promise.resolve(null)
+    ]);
+
+    if (!mainResp.ok) { const err = await mainResp.json(); throw new Error(err.error?.message || 'API hiba'); }
+    const mainResult = await mainResp.json();
+    const mainMatch = mainResult.content[0].text.match(/\{[\s\S]*\}/);
+    if (!mainMatch) throw new Error('Nem sikerült JSON választ kapni. Próbáld újra.');
+    currentData = JSON.parse(mainMatch[0]);
+
+    if (monthlyResp) {
+      if (!monthlyResp.ok) { const err = await monthlyResp.json(); throw new Error(err.error?.message || 'Havi kimutatás API hiba'); }
+      const monthlyResult = await monthlyResp.json();
+      const monthlyMatch = monthlyResult.content[0].text.match(/\{[\s\S]*\}/);
+      if (monthlyMatch) currentData._havi = JSON.parse(monthlyMatch[0]);
+    }
+
+    if (vevoResp) {
+      if (!vevoResp.ok) { const err = await vevoResp.json(); throw new Error(err.error?.message || 'Vevő API hiba'); }
+      const vevoResult = await vevoResp.json();
+      const vevoMatch = vevoResult.content[0].text.match(/\{[\s\S]*\}/);
+      if (vevoMatch) currentData._vevo = JSON.parse(vevoMatch[0]);
+    }
+
+    if (szallitoResp) {
+      if (!szallitoResp.ok) { const err = await szallitoResp.json(); throw new Error(err.error?.message || 'Szállító API hiba'); }
+      const szallitoResult = await szallitoResp.json();
+      const szallitoMatch = szallitoResult.content[0].text.match(/\{[\s\S]*\}/);
+      if (szallitoMatch) currentData._szallito = JSON.parse(szallitoMatch[0]);
+    }
+
+    setStep(3,'done'); setStep(4,'active');
     await sleep(500);
     renderReport(currentData);
     setScreen('result');
     document.getElementById('result-fname').textContent = currentFilename;
+    setStep(4,'done');
   } catch(e) {
     setScreen('upload');
     showError('Hiba: ' + e.message);
@@ -382,26 +532,33 @@ function toBase64(file) {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function buildPrompt(notes) {
+function buildPromptFokonyv(notes, hasComparison) {
   const notesSection = notes && notes.trim()
     ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — az elemzés készítésekor ezeket teljes egészében vedd figyelembe:\n${notes.trim()}\n`
     : '';
-  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.${notesSection}
 
-FONTOS SZABÁLYOK a szövegezéshez:
+  const compSection = hasComparison
+    ? `\nÖSSZEHASONLÍTÁS: Két főkönyv érkezett. A JSON-ban szerepeljen egy "elozoidoszak" objektum is, ugyanolyan "kpi" struktúrával az előző időszak adataival, és egy "valtozas" objektum amely az aktuális és előző időszak KPI-jainak százalékos változását tartalmazza (pozitív = növekedés, negatív = csökkenés).\n`
+    : '';
+
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.${notesSection}${compSection}
+
+FONTOS SZABÁLYOK:
 - Minden magyarázat tárgyilagos és tényszerű legyen
 - Ne használj minősítő jelzőket (pl. "egészséges", "kedvező", "kiemelkedő", "szilárd")
 - Csak számokat, arányokat, tényeket és összefüggéseket írj
 - A szöveg laikusok számára is érthető legyen, de szakmailag pontos
-- A HIPA-nál NE írd le a számítási módszert — csak a tényleges számokat közöld (kötelezettség, befizetett előleg, fennálló egyenleg önkormányzatonként)
-- A HIPA alapjának kiszámítása a bevallásból derül ki, a főkönyvből nem olvasható ki egyértelműen — ezért erről ne írj semmit
+- Az "idoszak" mezőbe pontosan azt írd, amit a főkönyvben találsz (pl. "2025. január 1. – március 31." ha negyedéves, "2025. január 1. – december 31." ha éves)
+- Az összes szöveges magyarázatban az időszakra vonatkozó kifejezéseknél NE használj "éves" szót ha az időszak nem egy teljes év — helyette mondd: "az időszak árbevétele", "a vizsgált időszakban"
+- A HIPA-nál NE írd le a számítási módszert — csak a tényleges számokat közöld
+- A HIPA alapjának kiszámítása a bevallásból derül ki — erről ne írj semmit
 
 JSON STRUKTÚRA:
 {
   "ceg": "cég teljes neve",
   "adoszam": "adószám",
-  "idoszak": "pl. 2025. január 1. – december 31.",
-  "adoalany_tipusa": "KIVA vagy TAO vagy egyéb — a főkönyvi számlákból azonosítva",
+  "idoszak": "pontosan a főkönyvből kiolvasott időszak",
+  "adoalany_tipusa": "KIVA vagy TAO vagy egyéb",
   "kpi": {
     "arbevetal": 0,
     "egyeb_bevetel": 0,
@@ -415,6 +572,8 @@ JSON STRUKTÚRA:
     "hipa_osszeg": 0,
     "osszes_ado": 0
   },
+  "elozoidoszak": null,
+  "valtozas": null,
   "koltsegek": [
     {"nev": "Közvetített szolgáltatás", "osszeg": 0},
     {"nev": "Anyagköltség", "osszeg": 0},
@@ -434,25 +593,147 @@ JSON STRUKTÚRA:
     {"nev": "Telephely / önkormányzat neve", "kotelezettseg": 0, "eloleleg": 0, "egyenleg": 0}
   ],
   "szoveg": {
-    "osszesito": "2-3 tárgyilagos mondat az év számairól. Konkrét összegek és arányok.",
-    "bevetelek": "A bevételek összetételének tárgyilagos leírása — mi az alaptevékenység, van-e egyéb bevétel, támogatás.",
-    "arfolyam": "Ha volt árfolyamhatás, annak tárgyilagos ismertetése számokkal. Ha nem volt, hagyd üresen (üres string).",
+    "osszesito": "2-3 tárgyilagos mondat az időszak számairól. Konkrét összegek és arányok. Ne használj 'éves' szót ha nem teljes éves az időszak.",
+    "bevetelek": "A bevételek összetételének tárgyilagos leírása.",
+    "arfolyam": "Ha volt árfolyamhatás, annak tárgyilagos ismertetése. Ha nem volt, üres string.",
     "koltsegek": "A legnagyobb kiadástételek tárgyilagos ismertetése és definíciója.",
     "berkoltseg": "A személyi jellegű kiadások összetételének tárgyilagos leírása számokkal.",
     "penz_helyzet": "A pénzeszközök és a vevő/szállító egyenleg tárgyilagos ismertetése számokkal.",
-    "liq_reszlet": "A likviditási ráta értéke és definíciója: forgóeszközök osztva rövid lejáratú kötelezettségekkel.",
-    "kiva_magyarazat": "Ha KIVA-alany: a KIVA mechanizmusának tárgyilagos leírása — mi az adóalap, mi a kulcs, mit vált ki a TAO és SZOCHO helyett. Ha nem KIVA-alany: a tényleges adónem leírása.",
-    "hipa_magyarazat": "A helyi iparűzési adó tárgyilagos ismertetése: mi ez az adónem, ki veti ki, mikor esedékes. NE szerepeljen benne semmilyen számítási módszer vagy formula.",
-    "ado_osszegzes": "Az összes adóteher összegének és a bevételhez viszonyított arányának tárgyilagos közlése."
+    "liq_reszlet": "A likviditási ráta értéke és definíciója.",
+    "kiva_magyarazat": "Ha KIVA-alany: a KIVA mechanizmusának tárgyilagos leírása. Ha nem: a tényleges adónem leírása.",
+    "hipa_magyarazat": "A HIPA tárgyilagos ismertetése: mi ez az adónem, ki veti ki, mikor esedékes. Számítási módszer NEM szerepelhet.",
+    "ado_osszegzes": "Az összes adóteher összegének és az időszaki bevételhez viszonyított arányának tárgyilagos közlése."
   }
 }`;
 }
 
-function fmtM(v) {
+function buildPromptEredmeny(notes) {
+  const notesSection = notes && notes.trim()
+    ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — az elemzés készítésekor ezeket teljes egészében vedd figyelembe:\n${notes.trim()}\n`
+    : '';
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt eredménykimutatást és adj vissza KIZÁRÓLAG egy valid JSON objektumot.${notesSection}
+
+FONTOS SZABÁLYOK:
+- Minden magyarázat tárgyilagos és tényszerű legyen, minősítő jelzők nélkül
+- A havi adatokat pontosan olvasd ki a dokumentumból
+- Ha nem minden hónap szerepel (évközi kimutatás), csak a meglévő hónapokat add vissza
+- A szöveg laikusok számára is érthető legyen
+
+JSON STRUKTÚRA:
+{
+  "ceg": "cég neve",
+  "adoszam": "adószám ha szerepel",
+  "idoszak": "pl. 2025. január – december vagy 2025. január – június",
+  "adoalany_tipusa": "TAO vagy KIVA — a dokumentumból azonosítva",
+  "osszesen": {
+    "bevetel": 0,
+    "kiad_mukodesi": 0,
+    "kiad_raforditas": 0,
+    "eredmeny": 0,
+    "tao_kiva": 0,
+    "hipa": 0
+  },
+  "honapok": [
+    {
+      "honap": "január",
+      "sorszam": 1,
+      "bevetel": 0,
+      "mukodesi_kiad": 0,
+      "raforditas": 0,
+      "eredmeny": 0
+    }
+  ],
+  "szoveg": {
+    "osszesito": "2-3 tárgyilagos mondat az időszak összesített eredményéről. Konkrét számok.",
+    "trend": "A havi eredmény alakulásának tárgyilagos leírása — mikor volt pozitív, mikor negatív, mi jellemzi az ingadozást.",
+    "legjobb_honap": "A legjobb eredményű hónap neve és eredménye számmal.",
+    "leggyengebb_honap": "A leggyengébb (legalacsonyabb vagy legnegatívabb) eredményű hónap neve és eredménye számmal.",
+    "koltségstruktura": "A működési kiadások fő tételeinek tárgyilagos leírása az időszakra összesítve.",
+    "ado": "Az adóteher tárgyilagos ismertetése — összeg és típus."
+  }
+}`;
+}
+
+function buildPromptHavi() {
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt havi eredménykimutatást és adj vissza KIZÁRÓLAG egy valid JSON objektumot.
+
+A dokumentumból kinyered az összes sort (bevétel és kiadás sorok) és minden hónapra az értéket.
+
+JSON STRUKTÚRA:
+{
+  "idoszak": "pl. 2025. január – december",
+  "honapok": ["január","február","március","április","május","június","július","augusztus","szeptember","október","november","december"],
+  "sorok": [
+    {
+      "kod": "91",
+      "nev": "Árbevétel",
+      "tipus": "bevetel",
+      "ertekek": [0,0,0,0,0,0,0,0,0,0,0,0],
+      "osszesen": 0
+    }
+  ],
+  "osszesito": {
+    "bevetel_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
+    "kiad_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
+    "eredmeny_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
+    "bevetel_total": 0,
+    "kiad_total": 0,
+    "eredmeny_total": 0
+  }
+}
+
+FONTOS:
+- A "tipus" mező értéke: "bevetel" (9-es számlák), "mukodesi_kiad" (5-es számlák), "raforditas" (8-as számlák)
+- Az "ertekek" tömb pontosan annyi elemet tartalmazzon, ahány hónap van a dokumentumban
+- Ha egy cellában 0 vagy üres érték van, azt 0-ként add vissza
+- A sorok között szerepeljen az összes sor amit a dokumentumban látsz (összesítő sorok is)
+- Az összesítő soroknál a "tipus" legyen "osszesito_bevetel", "osszesito_kiad" vagy "osszesito_eredmeny"`;
+}
+
+function buildPromptPartner(tipus) {
+  const leiras = tipus === 'vevo'
+    ? 'vevőkövetelések (kimenő számlákat tartalmazó pénzügyi nyilvántartás)'
+    : 'szállítói tartozások (bejövő számlákat tartalmazó pénzügyi nyilvántartás)';
+  const mezok = tipus === 'vevo'
+    ? '"osszesen_brutto": 0, "osszesen_rendezetlen": 0'
+    : '"osszesen_brutto": 0, "osszesen_rendezetlen": 0';
+
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt ${leiras} dokumentumot és adj vissza KIZÁRÓLAG egy valid JSON objektumot.
+
+A dokumentumban partnerenként szerepelnek a tételek, minden partnerhez tartozik egy "Összesen" és "Rendezetlen" összeg.
+
+STÁTUSZ meghatározása:
+- Ha a rendezetlen összeg > 0 ÉS a számlák kelte régebbi mint 30 napja → "lejart"
+- Ha a rendezetlen összeg > 0 ÉS a számlák frissek (aktuális hónap) → "folyo"
+- Ha az összesen > rendezetlen (tehát részben rendezett) → "reszben"
+- Ha rendezetlen = 0 → ne szerepeljen a listában
+
+JSON STRUKTÚRA:
+{
+  "tipus": "${tipus}",
+  "osszesen_brutto": 0,
+  "osszesen_rendezetlen": 0,
+  "partnerek": [
+    {
+      "nev": "Partner neve",
+      "osszesen_brutto": 0,
+      "rendezetlen": 0,
+      "statusz": "lejart | folyo | reszben",
+      "megjegyzes": "pl. számla típusa ha feltűnő (Adminisztráció, Könyvelési díj stb.)"
+    }
+  ]
+}
+
+FONTOS:
+- Csak azokat a partnereket vedd bele, ahol rendezetlen > 0
+- A "nev" mező pontosan a dokumentumban szereplő partnernév legyen
+- Az összegek forintban szerepeljenek (ne eFt-ban)
+- Rendezd csökkenő sorrendbe rendezetlen összeg szerint`;
+}
   if (!v || isNaN(v)) return '—';
-  const m = v / 1000000;
-  if (Math.abs(m) >= 1000) return (m/1000).toLocaleString('hu-HU', {maximumFractionDigits:2}) + ' Mrd Ft';
-  return m.toLocaleString('hu-HU', {maximumFractionDigits:1}) + ' M Ft';
+  const eFt = Math.round(v / 1000);
+  if (Math.abs(v) >= 1000000000) return (v/1000000000).toLocaleString('hu-HU', {maximumFractionDigits:2}) + ' Mrd Ft';
+  return eFt.toLocaleString('hu-HU') + ' eFt';
 }
 
 function pct(a, b) {
@@ -460,9 +741,421 @@ function pct(a, b) {
   return Math.round(a / b * 100) + '%';
 }
 
+function fmtValtozas(v) {
+  if (v === null || v === undefined || isNaN(v)) return '';
+  const sign = v > 0 ? '+' : '';
+  const color = v > 0 ? '#14917F' : v < 0 ? '#C0391B' : '#9B7355';
+  return `<span style="font-size:11px;font-weight:500;color:${color};margin-left:6px">${sign}${Math.round(v)}%</span>`;
+}
+
+function openPrintView() {
+  if (!currentData) return;
+  const d = currentData;
+  const preview = document.getElementById('client-preview').innerHTML;
+  const sc = 'script';
+  const w = window.open('', '_blank');
+  w.document.write([
+    '<!DOCTYPE html><html lang="hu"><head>',
+    '<meta charset="UTF-8">',
+    '<title>SukorADÓ · Nyomtatás · ' + (d.ceg||'') + '</title>',
+    '<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">',
+    '<' + sc + ' src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></' + sc + '>',
+    '<style>',
+    ':root{--br9:#2C1810;--br8:#4A2C1A;--br7:#6B3E26;--br6:#8B5E3C;--br5:#A67C52;--br4:#C49A6C;--br3:#D4B896;--br2:#E8D5C0;--br1:#F5EDE3;--br0:#FAF6F1;--tl7:#0D5C54;--tl6:#0F7268;--tl5:#14917F;--tl4:#1DB399;--tl3:#5ECBB8;--tl2:#A0DDD4;--tl0:#EEF9F7;--tx:#1A0F08;--txm:#5C3D25;--txs:#9B7355;--bd:#D4B896;--bdl:#EAD9C8}',
+    '*{box-sizing:border-box;margin:0;padding:0}',
+    "body{font-family:'DM Sans',sans-serif;background:#fff;color:#1A0F08;padding:1.5rem;max-width:900px;margin:0 auto}",
+    '.print-btn{position:fixed;top:1rem;right:1rem;background:#4A2C1A;color:#F5EDE3;border:none;padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif;z-index:999}',
+    '.cr-tabs{display:none}',
+    '.cr-sec{display:block!important;margin-bottom:1.5rem}',
+    '.cr-hdr{background:linear-gradient(135deg,#2C1810 0%,#4A2C1A 55%,#6B3E26 100%);border-radius:16px;padding:2rem;margin-bottom:1.5rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+    '.ado-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid}',
+    '.ins,.mc,.cb{break-inside:avoid}',
+    '@media print{.print-btn{display:none}body{padding:0}}',
+    '</style></head><body>',
+    '<button class="print-btn" onclick="window.print()">Nyomtatás / PDF mentés</button>',
+    preview,
+    '<' + sc + '>',
+    'document.querySelectorAll(".cr-sec").forEach(s=>s.classList.add("on"));',
+    'document.querySelectorAll(".cr-tab").forEach(b=>b.classList.add("on"));',
+    'function fmtM(v){if(!v||isNaN(v))return"\u2014";if(Math.abs(v)>=1000000000)return(v/1000000000).toLocaleString("hu-HU",{maximumFractionDigits:2})+" Mrd Ft";return Math.round(v/1000).toLocaleString("hu-HU")+" eFt";}',
+    'var d=' + JSON.stringify(d) + ';',
+    'var k=d.kpi||{};var kl=(d.koltsegek||[]).filter(c=>c.osszeg>0).sort((a,b)=>b.osszeg-a.osszeg);var pe=(d.penzeszk||[]).filter(p=>p.osszeg>0);',
+    'var kC=["#D85A30","#E24B4A","#BA7517","#EF9F27","#534AB7","#888780","#B4B2A9"];var gc="rgba(107,62,38,.1)";',
+    'function tryC(id,cfg){var el=document.getElementById(id);if(el)new Chart(el,cfg);}',
+    'function bO(labels,data,colors){return{type:"bar",data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtM(c.raw)}}},scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}}};}',
+    'tryC("cv1",bO(["Árbevétel","Kiadás"],[k.arbevetal,k.oszes_kiad],["#14917F","#D85A30"]));',
+    'tryC("cv2",bO(["Bevétel","Kiadás","Eredmény"],[k.arbevetal,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
+    'if(kl.length)tryC("cv3",{type:"doughnut",data:{labels:kl.map(c=>c.nev),datasets:[{data:kl.map(c=>c.osszeg),backgroundColor:kC,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"54%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
+    'if(pe.length)tryC("cv4",{type:"doughnut",data:{labels:pe.map(p=>p.nev),datasets:[{data:pe.map(p=>p.osszeg),backgroundColor:["#14917F","#1DB399","#5ECBB8","#A0DDD4"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
+    '</' + sc + '>',
+    '</body></html>'
+  ].join('\n'));
+  w.document.close();
+}
+
+function renderHaviTab(h) {
+  if (!h || !h.sorok) return '';
+  const honNevek = h.honapok || [];
+  const nHon = honNevek.length;
+  const sorok = h.sorok || [];
+  const osszesito = h.osszesito || {};
+
+  // Color coding by row type
+  const tipusStyle = {
+    'bevetel':           'color:#0F7268;font-weight:500',
+    'mukodesi_kiad':     'color:var(--txm)',
+    'raforditas':        'color:var(--txm)',
+    'osszesito_bevetel': 'background:var(--tl0);color:#0D5C54;font-weight:500',
+    'osszesito_kiad':    'background:#FAECE7;color:#7A2E0E;font-weight:500',
+    'osszesito_eredmeny':'background:var(--br1);color:var(--br8);font-weight:500;border-top:2px solid var(--br3)'
+  };
+
+  // Best/worst month from eredmeny_honapok
+  const eredHon = osszesito.eredmeny_honapok || [];
+  let bestIdx = 0, worstIdx = 0;
+  eredHon.forEach((v,i) => {
+    if (v > eredHon[bestIdx]) bestIdx = i;
+    if (v < eredHon[worstIdx]) worstIdx = i;
+  });
+  const bestNev = honNevek[bestIdx] || '—';
+  const worstNev = honNevek[worstIdx] || '—';
+
+  const colW = Math.max(70, Math.floor(560 / nHon));
+
+  const headerCols = honNevek.map(hn =>
+    `<th style="padding:8px 6px;text-align:right;font-weight:500;color:var(--br7);font-size:10px;text-transform:uppercase;letter-spacing:.03em;min-width:${colW}px;white-space:nowrap">${hn.substring(0,3)}</th>`
+  ).join('') + `<th style="padding:8px 10px;text-align:right;font-weight:500;color:var(--br7);font-size:10px;text-transform:uppercase;min-width:80px">Összesen</th>`;
+
+  const dataRows = sorok.map((sor, ri) => {
+    const st = tipusStyle[sor.tipus] || '';
+    const isSummary = sor.tipus && sor.tipus.startsWith('osszesito');
+    const vals = (sor.ertekek || []).map((v, ci) => {
+      const num = v || 0;
+      const isEredmeny = sor.tipus === 'osszesito_eredmeny';
+      const col = isEredmeny ? (num >= 0 ? '#0F7268' : '#C0391B') : '';
+      const colStyle = col ? `color:${col}` : '';
+      const hilightBest = isEredmeny && ci === bestIdx ? 'background:rgba(20,145,127,.08)' : '';
+      const hilightWorst = isEredmeny && ci === worstIdx ? 'background:rgba(216,90,48,.08)' : '';
+      return `<td style="padding:7px 6px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums;${colStyle};${hilightBest}${hilightWorst}">${num === 0 ? '—' : fmtM(num)}</td>`;
+    }).join('');
+    const totalNum = sor.osszesen || 0;
+    const totalIsEred = sor.tipus === 'osszesito_eredmeny';
+    const totalCol = totalIsEred ? (totalNum >= 0 ? '#0F7268' : '#C0391B') : '';
+    return `<tr style="border-top:1px solid var(--bdl);${ri%2===1&&!isSummary?'background:var(--br0)':''}">
+      <td style="padding:7px 10px;font-size:12px;white-space:nowrap;${st};max-width:200px;overflow:hidden;text-overflow:ellipsis">${sor.nev || '—'}</td>
+      ${vals}
+      <td style="padding:7px 10px;text-align:right;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;${totalCol?'color:'+totalCol:''}">${totalNum === 0 ? '—' : fmtM(totalNum)}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div id="c6" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num" style="background:var(--tl6)">6</span>Havi kimutatás</div>
+    <div class="ins info" style="margin-bottom:1rem">Az alábbi táblázat az eredménykimutatás teljes részletezését tartalmazza havi bontásban. A <span style="color:#0F7268;font-weight:500">zöld</span> cellák nyereséges hónapot, a <span style="color:#C0391B;font-weight:500">piros</span> cellák veszteséges hónapot jelölnek az eredmény soron.</div>
+    <div class="mc-row" style="margin-bottom:1.25rem">
+      <div class="mc" style="border-left:3px solid #14917F">
+        <div class="mc-lbl">Legjobb hónap</div>
+        <div class="mc-val pos">${bestNev}</div>
+        <div class="mc-sub">${fmtM(eredHon[bestIdx]||0)} eredmény</div>
+      </div>
+      <div class="mc" style="border-left:3px solid #D85A30">
+        <div class="mc-lbl">Leggyengébb hónap</div>
+        <div class="mc-val neg">${worstNev}</div>
+        <div class="mc-sub">${fmtM(eredHon[worstIdx]||0)} eredmény</div>
+      </div>
+      <div class="mc">
+        <div class="mc-lbl">Nyereséges hónapok</div>
+        <div class="mc-val">${eredHon.filter(v=>v>0).length} / ${nHon}</div>
+      </div>
+      <div class="mc">
+        <div class="mc-lbl">Időszaki eredmény</div>
+        <div class="mc-val ${(osszesito.eredmeny_total||0)>=0?'pos':'neg'}">${fmtM(osszesito.eredmeny_total||0)}</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--bdl)">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:600px">
+        <thead>
+          <tr style="background:var(--br1)">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;color:var(--br7);font-size:10px;text-transform:uppercase;letter-spacing:.04em;min-width:160px;position:sticky;left:0;background:var(--br1)">Megnevezés</th>
+            ${headerCols}
+          </tr>
+        </thead>
+        <tbody>${dataRows}</tbody>
+      </table>
+    </div>
+    <p style="font-size:11px;color:var(--txs);margin-top:8px">A táblázat vízszintesen görgethető. A hónapok oszlopai a forrás dokumentummal megegyező sorrendben szerepelnek.</p>
+  </div>`;
+}
+
+function renderEredmeny(d) {
+  const o = d.osszesen || {};
+  const s = d.szoveg || {};
+  const honapok = (d.honapok || []).sort((a,b) => a.sorszam - b.sorszam);
+  const today = new Date().toLocaleDateString('hu-HU', {year:'numeric',month:'long',day:'numeric'});
+  const marzs = o.bevetel > 0 ? Math.round(o.eredmeny / o.bevetel * 100) : 0;
+
+  const honNevek = honapok.map(h => h.honap.substring(0,3));
+  const honBev = honapok.map(h => Math.round((h.bevetel||0)/1000));
+  const honKiad = honapok.map(h => Math.round(((h.mukodesi_kiad||0)+(h.raforditas||0))/1000));
+  const honEred = honapok.map(h => Math.round((h.eredmeny||0)/1000));
+
+  // Cumulative result
+  let cumul = 0;
+  const honCumul = honapok.map(h => { cumul += (h.eredmeny||0); return Math.round(cumul/1000); });
+
+  const legjobb = honapok.reduce((a,b) => (b.eredmeny||0) > (a.eredmeny||0) ? b : a, honapok[0]||{});
+  const leggyenge = honapok.reduce((a,b) => (b.eredmeny||0) < (a.eredmeny||0) ? b : a, honapok[0]||{});
+
+  document.getElementById('client-preview').innerHTML = `
+  <div class="cr-wrap">
+    <div class="cr-hdr">
+      <div class="cr-hdr-top">
+        <div>
+          <div class="cr-brand">SukorADÓ · Eredménykimutatás elemzés</div>
+          <div class="cr-cegnev">${d.ceg||'—'}</div>
+          <div class="cr-meta">${d.adoszam?'Adószám: '+d.adoszam+' · ':''}Elkészítve: ${today}</div>
+        </div>
+        <div class="cr-period">
+          <div class="cr-period-lbl">Időszak</div>
+          <div class="cr-period-val">${d.idoszak||'—'}</div>
+        </div>
+      </div>
+      <div class="cr-kpi-row">
+        <div class="cr-kpi"><div class="cr-kpi-lbl">Összes bevétel</div><div class="cr-kpi-val">${fmtM(o.bevetel)}</div><div class="cr-kpi-sub neu">${honapok.length} hónap</div></div>
+        <div class="cr-kpi"><div class="cr-kpi-lbl">Összes kiadás</div><div class="cr-kpi-val">${fmtM((o.kiad_mukodesi||0)+(o.kiad_raforditas||0))}</div><div class="cr-kpi-sub neg">működési + ráfordítás</div></div>
+        <div class="cr-kpi"><div class="cr-kpi-lbl">Időszaki eredmény</div><div class="cr-kpi-val">${fmtM(o.eredmeny)}</div><div class="cr-kpi-sub ${o.eredmeny>=0?'pos':'neg'}">${marzs}% marzs</div></div>
+        <div class="cr-kpi"><div class="cr-kpi-lbl">Adóteher</div><div class="cr-kpi-val">${fmtM((o.tao_kiva||0)+(o.hipa||0))}</div><div class="cr-kpi-sub neg">${d.adoalany_tipusa||'TAO'} + HIPA</div></div>
+      </div>
+    </div>
+
+    <div class="cr-tabs">
+      <button class="cr-tab on" onclick="crTab('e1',this)">Összefoglaló</button>
+      <button class="cr-tab" onclick="crTab('e2',this)">Havi trend</button>
+      <button class="cr-tab" onclick="crTab('e3',this)">Halmozott eredmény</button>
+      <button class="cr-tab" onclick="crTab('e4',this)">Havi részletezés</button>
+    </div>
+
+    <div id="e1" class="cr-sec on">
+      <div class="cr-sec-title"><span class="cr-sec-num">1</span>Az időszak összefoglalója</div>
+      <div class="ins info">${s.osszesito||'—'}</div>
+      <div class="ins info">${s.koltségstruktura||'—'}</div>
+      <div class="mc-row">
+        <div class="mc" style="border-left:3px solid #14917F">
+          <div class="mc-lbl">Legjobb hónap</div>
+          <div class="mc-val pos">${legjobb.honap||'—'}</div>
+          <div class="mc-sub">${fmtM(legjobb.eredmeny||0)} eredmény</div>
+        </div>
+        <div class="mc" style="border-left:3px solid #D85A30">
+          <div class="mc-lbl">Leggyengébb hónap</div>
+          <div class="mc-val neg">${leggyenge.honap||'—'}</div>
+          <div class="mc-sub">${fmtM(leggyenge.eredmeny||0)} eredmény</div>
+        </div>
+        <div class="mc"><div class="mc-lbl">Pozitív hónapok</div><div class="mc-val">${honapok.filter(h=>h.eredmeny>0).length} / ${honapok.length}</div><div class="mc-sub">nyereséges hónapok száma</div></div>
+        <div class="mc"><div class="mc-lbl">Adóteher</div><div class="mc-val">${fmtM((o.tao_kiva||0)+(o.hipa||0))}</div><div class="mc-sub">${o.bevetel>0?Math.round(((o.tao_kiva||0)+(o.hipa||0))/o.bevetel*100)+'%':''} a bevételből</div></div>
+      </div>
+      <div class="ins info">${s.ado||'—'}</div>
+    </div>
+
+    <div id="e2" class="cr-sec">
+      <div class="cr-sec-title"><span class="cr-sec-num">2</span>Havi bevétel és kiadás</div>
+      <div class="ins info">${s.trend||'—'}</div>
+      <div class="cb" style="margin-bottom:1rem">
+        <div class="cb-title">Havi bevétel és kiadás (ezer Ft)</div>
+        <div class="cb-sub">Bevétel vs. összes kiadás hónapról hónapra</div>
+        <div style="position:relative;height:260px"><canvas id="ce1"></canvas></div>
+      </div>
+      <div class="cb">
+        <div class="cb-title">Havi eredmény (ezer Ft)</div>
+        <div class="cb-sub">Pozitív = nyereség, negatív = veszteség az adott hónapban</div>
+        <div style="position:relative;height:200px"><canvas id="ce2"></canvas></div>
+      </div>
+    </div>
+
+    <div id="e3" class="cr-sec">
+      <div class="cr-sec-title"><span class="cr-sec-num">3</span>Halmozott eredmény az időszakban</div>
+      <div class="ins info">A halmozott görbe azt mutatja, hogyan alakult a cég kumulált nyeresége vagy vesztesége az időszak első napjától kezdve. Ha a görbe emelkedik, az adott hónap nyereséges volt; ha csökken, veszteséges.</div>
+      <div class="cb">
+        <div class="cb-title">Halmozott eredmény alakulása (ezer Ft)</div>
+        <div class="cb-sub">${d.idoszak||''} — összesített pozíció hónapról hónapra</div>
+        <div style="position:relative;height:260px"><canvas id="ce3"></canvas></div>
+      </div>
+    </div>
+
+    <div id="e4" class="cr-sec">
+      <div class="cr-sec-title"><span class="cr-sec-num">4</span>Havi részletezés</div>
+      <div style="background:#fff;border:1px solid var(--bdl);border-radius:12px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:var(--br1)">
+              <th style="padding:10px 12px;text-align:left;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Hónap</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Bevétel</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Kiadás</th>
+              <th style="padding:10px 12px;text-align:right;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Eredmény</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${honapok.map((h,i) => `
+            <tr style="border-top:1px solid var(--bdl);${i%2===1?'background:var(--br0)':''}">
+              <td style="padding:9px 12px;font-weight:500;color:var(--br7)">${h.honap}</td>
+              <td style="padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums">${fmtM(h.bevetel||0)}</td>
+              <td style="padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--txs)">${fmtM((h.mukodesi_kiad||0)+(h.raforditas||0))}</td>
+              <td style="padding:9px 12px;text-align:right;font-weight:500;font-variant-numeric:tabular-nums;color:${(h.eredmeny||0)>=0?'#0F7268':'#C0391B'}">${fmtM(h.eredmeny||0)}</td>
+            </tr>`).join('')}
+            <tr style="border-top:2px solid var(--br3);background:var(--br1)">
+              <td style="padding:10px 12px;font-weight:500;color:var(--br8)">Összesen</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:500;color:var(--br8)">${fmtM(o.bevetel)}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:500;color:var(--br8)">${fmtM((o.kiad_mukodesi||0)+(o.kiad_raforditas||0))}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:500;color:${o.eredmeny>=0?'#0F7268':'#C0391B'}">${fmtM(o.eredmeny)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cr-ftr">
+      <div class="cr-ftr-brand">Sukor<span>ADÓ</span> · Könyvelés &amp; Adótanácsadás</div>
+      <div class="cr-ftr-note">Ez az összefoglaló tájékoztató jellegű, és nem helyettesíti a könyvelői konzultációt. · ${today}</div>
+    </div>
+  </div>`;
+
+  requestAnimationFrame(() => {
+    const gc = 'rgba(107,62,38,.1)';
+    // Chart 1: grouped bar bevétel vs kiadás
+    new Chart(document.getElementById('ce1'), {
+      type: 'bar',
+      data: {
+        labels: honNevek,
+        datasets: [
+          { label: 'Bevétel', data: honBev, backgroundColor: '#14917F', borderRadius: 4, borderSkipped: false },
+          { label: 'Kiadás', data: honKiad, backgroundColor: '#D85A30', borderRadius: 4, borderSkipped: false }
+        ]
+      },
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{position:'top',labels:{font:{size:11},boxWidth:12}}, tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw.toLocaleString('hu-HU')+' E Ft'}} },
+        scales:{ y:{ticks:{callback:v=>v.toLocaleString('hu-HU'),font:{size:10}},grid:{color:gc}}, x:{grid:{display:false}} }
+      }
+    });
+    // Chart 2: bar eredmény per month (green/red)
+    new Chart(document.getElementById('ce2'), {
+      type: 'bar',
+      data: {
+        labels: honNevek,
+        datasets: [{ label: 'Havi eredmény', data: honEred, backgroundColor: honEred.map(v => v>=0?'#1D9E75':'#D85A30'), borderRadius: 4, borderSkipped: false }]
+      },
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.raw.toLocaleString('hu-HU')+' E Ft'}} },
+        scales:{ y:{ticks:{callback:v=>v.toLocaleString('hu-HU'),font:{size:10}},grid:{color:gc}}, x:{grid:{display:false}} }
+      }
+    });
+    // Chart 3: line cumulative
+    new Chart(document.getElementById('ce3'), {
+      type: 'line',
+      data: {
+        labels: honNevek,
+        datasets: [{
+          label: 'Halmozott eredmény',
+          data: honCumul,
+          borderColor: '#14917F',
+          backgroundColor: 'rgba(20,145,127,.08)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: honCumul.map(v=>v>=0?'#14917F':'#D85A30'),
+          pointRadius: 5
+        }]
+      },
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.raw.toLocaleString('hu-HU')+' E Ft'}} },
+        scales:{
+          y:{ ticks:{callback:v=>v.toLocaleString('hu-HU'),font:{size:10}}, grid:{color:gc} },
+          x:{ grid:{display:false} }
+        }
+      }
+    });
+  });
+}
+
+function renderPartnerTab(data, tipus) {
+  if (!data || !data.partnerek) return '';
+  const isVevo = tipus === 'vevo';
+  const tabId = isVevo ? 'cv_vevo' : 'cv_szall';
+  const partnerek = data.partnerek || [];
+  const szin = isVevo ? '#1D6FA4' : '#8B4513';
+  const szinLight = isVevo ? '#E6F1FB' : '#FAECE7';
+  const szinBorder = isVevo ? '#B5D4F4' : '#F5C4B3';
+  const szinDark = isVevo ? '#185FA5' : '#7A2E0E';
+  const cim = isVevo ? 'Vevőkövetelések' : 'Szállítói tartozások';
+  const secNum = isVevo ? (data._haviExists ? '7' : '6') : (data._haviExists ? '8' : '7');
+
+  const top10 = partnerek.slice(0, 10);
+
+  const statuszBadge = (s) => {
+    if (s === 'lejart') return '<span style="display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;background:#FAECE7;color:#993C1D">lejárt</span>';
+    if (s === 'folyo') return '<span style="display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;background:#EEF9F7;color:#0D5C54">folyó</span>';
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;background:#FAEEDA;color:#633806">részben</span>';
+  };
+
+  const rows = partnerek.map((p, i) => `
+    <tr style="border-top:1px solid var(--bdl);${i%2===1?'background:var(--br0)':''}">
+      <td style="padding:8px 12px;font-weight:500;color:var(--br8);font-size:13px">${p.nev||'—'}</td>
+      <td style="padding:8px 12px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums">${(p.osszesen_brutto||0).toLocaleString('hu-HU')} Ft</td>
+      <td style="padding:8px 12px;text-align:right;font-size:13px;font-weight:500;color:${isVevo?'#185FA5':'#C0391B'};font-variant-numeric:tabular-nums">${(p.rendezetlen||0).toLocaleString('hu-HU')} Ft</td>
+      <td style="padding:8px 12px">${statuszBadge(p.statusz)}</td>
+    </tr>`).join('');
+
+  const lejartOsszeg = partnerek.filter(p => p.statusz === 'lejart').reduce((s,p) => s + (p.rendezetlen||0), 0);
+  const folyoOsszeg = partnerek.filter(p => p.statusz !== 'lejart').reduce((s,p) => s + (p.rendezetlen||0), 0);
+
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+    <div style="background:${szinLight};border:1px solid ${szinBorder};border-radius:10px;padding:.85rem 1.1rem;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:13px;font-weight:500;color:${szinDark}">Összes rendezetlen</div><div style="font-size:11px;color:var(--txs);margin-top:2px">${partnerek.length} partner</div></div>
+      <div style="font-size:18px;font-weight:500;color:${szin}">${Math.round((data.osszesen_rendezetlen||0)/1000).toLocaleString('hu-HU')} eFt</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:#FAECE7;border:1px solid #F5C4B3;border-radius:10px;padding:.75rem .9rem">
+        <div style="font-size:11px;color:#993C1D;margin-bottom:3px">Lejárt tételek</div>
+        <div style="font-size:16px;font-weight:500;color:#C0391B">${Math.round(lejartOsszeg/1000).toLocaleString('hu-HU')} eFt</div>
+        <div style="font-size:10px;color:var(--txs);margin-top:2px">${partnerek.filter(p=>p.statusz==='lejart').length} partner</div>
+      </div>
+      <div style="background:#EEF9F7;border:1px solid #9FE1CB;border-radius:10px;padding:.75rem .9rem">
+        <div style="font-size:11px;color:#0D5C54;margin-bottom:3px">Folyó / részben</div>
+        <div style="font-size:16px;font-weight:500;color:#0F7268">${Math.round(folyoOsszeg/1000).toLocaleString('hu-HU')} eFt</div>
+        <div style="font-size:10px;color:var(--txs);margin-top:2px">${partnerek.filter(p=>p.statusz!=='lejart').length} partner</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--bdl);margin-bottom:1rem">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:var(--br1)">
+        <th style="padding:9px 12px;text-align:left;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Partner neve</th>
+        <th style="padding:9px 12px;text-align:right;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Összesen (bruttó)</th>
+        <th style="padding:9px 12px;text-align:right;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Rendezetlen</th>
+        <th style="padding:9px 12px;font-weight:500;color:var(--br7);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Státusz</th>
+      </tr></thead>
+      <tbody>
+        ${rows}
+        <tr style="border-top:2px solid var(--br3);background:var(--br1)">
+          <td style="padding:9px 12px;font-weight:500;color:var(--br8)">Mindösszesen</td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:var(--br8);font-variant-numeric:tabular-nums">${(data.osszesen_brutto||0).toLocaleString('hu-HU')} Ft</td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:${szin};font-variant-numeric:tabular-nums">${(data.osszesen_rendezetlen||0).toLocaleString('hu-HU')} Ft</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background:#fff;border:1px solid var(--bdl);border-radius:12px;padding:1.2rem">
+    <div style="font-size:13px;font-weight:500;color:var(--br7);margin-bottom:3px">Top 10 legnagyobb ${isVevo ? 'vevőkövetelés' : 'szállítói tartozás'}</div>
+    <div style="font-size:12px;color:var(--txs);margin-bottom:12px">Rendezetlen összeg partnerenként (eFt)</div>
+    <div style="position:relative;height:${Math.min(top10.length * 36 + 60, 320)}px"><canvas id="${tabId}"></canvas></div>
+  </div>`;
+}
+
 function renderReport(d) {
   const k = d.kpi || {};
   const s = d.szoveg || {};
+  const prev = d.elozoidoszak || null;
+  const valtozas = d.valtozas || null;
   const koltsegek = (d.koltsegek || []).filter(c => c.osszeg > 0).sort((a,b) => b.osszeg - a.osszeg);
   const penzek = (d.penzeszk || []).filter(p => p.osszeg > 0);
   const hipa = d.hipa_telephelyek || [];
@@ -470,6 +1163,8 @@ function renderReport(d) {
   const kColors = ['#D85A30','#E24B4A','#BA7517','#EF9F27','#534AB7','#888780','#B4B2A9'];
   const marzs = k.arbevetal > 0 ? Math.round(k.eredmeny / k.arbevetal * 100) : 0;
   const today = new Date().toLocaleDateString('hu-HU', {year:'numeric',month:'long',day:'numeric'});
+  const idoszakLabel = d.idoszak || '—';
+  const hasPrev = !!prev;
 
   const koltBars = koltsegek.map((c,i) => `
     <div class="cr-row">
@@ -490,6 +1185,17 @@ function renderReport(d) {
       <div class="hipa-sub">fennálló egyenleg</div>
     </div>`).join('')}</div>` : '';
 
+  const compRow = hasPrev && valtozas ? `
+  <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.85rem 1rem;margin-top:10px">
+    <div style="font-size:10px;color:var(--br4);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">Előző időszakhoz képest</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;font-size:12px">
+      <div><span style="color:var(--br3)">Bevétel</span><br><span style="color:#fff;font-weight:500">${fmtM(prev.arbevetal)}</span>${fmtValtozas(valtozas.arbevetal)}</div>
+      <div><span style="color:var(--br3)">Kiadás</span><br><span style="color:#fff;font-weight:500">${fmtM(prev.oszes_kiad)}</span>${fmtValtozas(valtozas.oszes_kiad)}</div>
+      <div><span style="color:var(--br3)">Eredmény</span><br><span style="color:#fff;font-weight:500">${fmtM(prev.eredmeny)}</span>${fmtValtozas(valtozas.eredmeny)}</div>
+      <div><span style="color:var(--br3)">Pénzeszköz</span><br><span style="color:#fff;font-weight:500">${fmtM(prev.penzeszkoz)}</span>${fmtValtozas(valtozas.penzeszkoz)}</div>
+    </div>
+  </div>` : '';
+
   const html = `<div class="cr-wrap">
   <div class="cr-hdr">
     <div class="cr-hdr-top">
@@ -500,31 +1206,35 @@ function renderReport(d) {
       </div>
       <div class="cr-period">
         <div class="cr-period-lbl">Vizsgált időszak</div>
-        <div class="cr-period-val">${d.idoszak || '—'}</div>
+        <div class="cr-period-val">${idoszakLabel}</div>
       </div>
     </div>
     <div class="cr-kpi-row">
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Éves bevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">értékesítés + egyéb</div></div>
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési cost</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Bevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">értékesítés + egyéb</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési cost</div></div>
       <div class="cr-kpi"><div class="cr-kpi-lbl">Eredmény</div><div class="cr-kpi-val">${fmtM(k.eredmeny)}</div><div class="cr-kpi-sub ${k.eredmeny>=0?'pos':'neg'}">${marzs}% marzs</div></div>
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA + HIPA + egyéb</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA/TAO + HIPA + egyéb</div></div>
     </div>
+    ${compRow}
   </div>
 
   <div class="cr-tabs">
-    <button class="cr-tab on" onclick="crTab('c1',this)">Az év röviden</button>
+    <button class="cr-tab on" onclick="crTab('c1',this)">Az időszak röviden</button>
     <button class="cr-tab" onclick="crTab('c2',this)">Eredmény</button>
     <button class="cr-tab" onclick="crTab('c3',this)">Kiadások</button>
     <button class="cr-tab" onclick="crTab('c4',this)">Pénzügyi helyzet</button>
     <button class="cr-tab ado" onclick="crTab('c5',this)">Adók részletesen</button>
+    ${d._havi ? `<button class="cr-tab" style="border-color:var(--tl5);color:var(--tl6)" onclick="crTab('c6',this)">Havi kimutatás</button>` : ''}
+    ${d._vevo ? `<button class="cr-tab" style="border-color:#1D6FA4;color:#1D6FA4" onclick="crTab('c7',this)">Vevőkövetelések</button>` : ''}
+    ${d._szallito ? `<button class="cr-tab" style="border-color:#8B4513;color:#8B4513" onclick="crTab('c8',this)">Szállítói tartozások</button>` : ''}
   </div>
 
   <div id="c1" class="cr-sec on">
-    <div class="cr-sec-title"><span class="cr-sec-num">1</span>Az év röviden</div>
+    <div class="cr-sec-title"><span class="cr-sec-num">1</span>Az időszak röviden</div>
     <div class="ins info">${s.osszesito || '—'}</div>
     <div class="ins info">${s.bevetelek || '—'}</div>
     <div class="cg">
-      <div class="cb"><div class="cb-title">Bevétel és kiadás</div><div class="cb-sub">Az éves pénzforgalom főbb tételei</div><div style="position:relative;height:200px"><canvas id="cv1"></canvas></div></div>
+      <div class="cb"><div class="cb-title">Bevétel és kiadás</div><div class="cb-sub">${idoszakLabel}</div><div style="position:relative;height:200px"><canvas id="cv1"></canvas></div></div>
       <div class="cb"><div class="cb-title">Bevétel → Kiadás → Eredmény</div><div class="cb-sub">Hogyan keletkezett a nyereség?</div><div style="position:relative;height:200px"><canvas id="cv2"></canvas></div></div>
     </div>
   </div>
@@ -535,7 +1245,7 @@ function renderReport(d) {
       <div class="mc"><div class="mc-lbl">Értékesítés árbevétele</div><div class="mc-val pos">${fmtM(k.arbevetal)}</div></div>
       <div class="mc"><div class="mc-lbl">Egyéb bevételek</div><div class="mc-val pos">${fmtM(k.egyeb_bevetel)}</div><div class="mc-sub">támogatás, kártérítés</div></div>
       <div class="mc"><div class="mc-lbl">Adózás előtti eredmény</div><div class="mc-val ${k.eredmeny>=0?'pos':'neg'}">${fmtM(k.eredmeny)}</div><div class="mc-sub">${marzs}% a bevételből</div></div>
-      <div class="mc"><div class="mc-lbl">KIVA-ráfordítás</div><div class="mc-val neg">${fmtM(k.kiva_osszeg)}</div></div>
+      <div class="mc"><div class="mc-lbl">Adóterhelés</div><div class="mc-val neg">${fmtM(k.kiva_osszeg||k.osszes_ado)}</div></div>
     </div>
     <div class="ins info">${s.bevetelek || '—'}</div>
     ${s.arfolyam ? `<div class="ins info">${s.arfolyam}</div>` : ''}
@@ -615,6 +1325,22 @@ function renderReport(d) {
     <div class="zarszó">Ez az összefoglaló a főkönyvi kivonat adatain alapul, és tájékoztató jellegű. Az adózással kapcsolatos döntésekhez kérjük, egyeztessen könyvelőjével.<br><br><b>— SukorADÓ csapata</b></div>
   </div>
 
+  ${d._havi ? renderHaviTab(d._havi) : ''}
+
+  ${d._vevo ? `
+  <div id="c7" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num" style="background:#1D6FA4">V</span>Vevőkövetelések — rendezetlen tételek</div>
+    <div class="ins info">Partnerenként összesített vevőkövetelések. A <b style="color:#993C1D">lejárt</b> jelölés a fizetési határidőn túli, a <b style="color:#0D5C54">folyó</b> az aktuális, a <b style="color:#633806">részben</b> a csak részlegesen rendezett tételeket jelöli.</div>
+    ${renderPartnerTab(d._vevo, 'vevo')}
+  </div>` : ''}
+
+  ${d._szallito ? `
+  <div id="c8" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num" style="background:#8B4513">Sz</span>Szállítói tartozások — rendezetlen tételek</div>
+    <div class="ins warn">Partnerenként összesített szállítói tartozások. A lejárt tételek azonnali rendezést igényelhetnek.</div>
+    ${renderPartnerTab(d._szallito, 'szallito')}
+  </div>` : ''}
+
   <div class="cr-ftr">
     <div class="cr-ftr-brand">Sukor<span>ADÓ</span> · Könyvelés &amp; Adótanácsadás</div>
     <div class="cr-ftr-note">Ez az összefoglaló tájékoztató jellegű, és nem helyettesíti a könyvelői konzultációt. · ${today}</div>
@@ -650,6 +1376,40 @@ function renderReport(d) {
         plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.raw)}}}
       }
     });
+
+    // Vevő top10 chart
+    if (d._vevo && d._vevo.partnerek) {
+      const top10v = (d._vevo.partnerek||[]).slice(0,10);
+      tryC('cv_vevo', {
+        type: 'bar', indexAxis: 'y',
+        data: { labels: top10v.map(p=>p.nev.length>28?p.nev.substring(0,28)+'…':p.nev),
+          datasets: [{ data: top10v.map(p=>Math.round((p.rendezetlen||0)/1000)),
+            backgroundColor: top10v.map(p=>p.statusz==='lejart'?'#C0391B':p.statusz==='reszben'?'#EF9F27':'#1D6FA4'),
+            borderRadius: 4, borderSkipped: false }]
+        },
+        options: { responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString('hu-HU')+' eFt'}}},
+          scales:{x:{ticks:{callback:v=>v.toLocaleString('hu-HU'),font:{size:10}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:11}}}}
+        }
+      });
+    }
+
+    // Szállító top10 chart
+    if (d._szallito && d._szallito.partnerek) {
+      const top10s = (d._szallito.partnerek||[]).slice(0,10);
+      tryC('cv_szall', {
+        type: 'bar', indexAxis: 'y',
+        data: { labels: top10s.map(p=>p.nev.length>28?p.nev.substring(0,28)+'…':p.nev),
+          datasets: [{ data: top10s.map(p=>Math.round((p.rendezetlen||0)/1000)),
+            backgroundColor: top10s.map(p=>p.statusz==='lejart'?'#C0391B':p.statusz==='reszben'?'#EF9F27':'#8B4513'),
+            borderRadius: 4, borderSkipped: false }]
+        },
+        options: { responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toLocaleString('hu-HU')+' eFt'}}},
+          scales:{x:{ticks:{callback:v=>v.toLocaleString('hu-HU'),font:{size:10}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:11}}}}
+        }
+      });
+    }
   });
 }
 
@@ -714,7 +1474,7 @@ function downloadHTML() {
     preview,
     '<' + sc + '>',
     'function crTab(id,btn){document.querySelectorAll(".cr-sec").forEach(s=>s.classList.remove("on"));document.querySelectorAll(".cr-tab").forEach(b=>b.classList.remove("on"));document.getElementById(id).classList.add("on");btn.classList.add("on");}',
-    'function fmtM(v){if(!v||isNaN(v))return"\u2014";const m=v/1000000;if(Math.abs(m)>=1000)return(m/1000).toLocaleString("hu-HU",{maximumFractionDigits:2})+" Mrd Ft";return m.toLocaleString("hu-HU",{maximumFractionDigits:1})+" M Ft";}',
+    'function fmtM(v){if(!v||isNaN(v))return"\u2014";if(Math.abs(v)>=1000000000)return(v/1000000000).toLocaleString("hu-HU",{maximumFractionDigits:2})+" Mrd Ft";return Math.round(v/1000).toLocaleString("hu-HU")+" eFt";}',
     '(function(){',
     'var d=' + dataStr + ';',
     'var k=d.kpi||{};',
@@ -743,12 +1503,25 @@ function downloadHTML() {
 }
 
 function resetApp() {
-  currentData = null; currentFile = null; currentFilename = '';
-  document.getElementById('uz-title').textContent = 'Kattints ide a feltöltéshez';
-  document.getElementById('uz-hint').textContent = 'vagy húzd rá a fájlt';
+  currentData = null; currentFile = null; currentFile2 = null; currentFile3 = null;
+  currentFile4 = null; currentFile5 = null; currentFilename = '';
+  document.getElementById('uz-title').textContent = 'Kattints ide';
+  document.getElementById('uz-hint').textContent = 'vagy húzd rá';
+  document.getElementById('uz-title2').textContent = 'Előző főkönyv';
+  document.getElementById('uz-hint2').textContent = 'opcionális';
+  document.getElementById('uz-title3').textContent = 'Havi kimutatás';
+  document.getElementById('uz-hint3').textContent = 'opcionális';
+  document.getElementById('uz-title4').textContent = 'Vevő nyilvántartás';
+  document.getElementById('uz-hint4').textContent = 'opcionális';
+  document.getElementById('uz-title5').textContent = 'Szállító nyilvántartás';
+  document.getElementById('uz-hint5').textContent = 'opcionális';
   document.getElementById('error-msg').style.display = 'none';
   document.getElementById('client-preview').innerHTML = '';
   document.getElementById('notes').value = '';
+  ['file-input','file-input2','file-input3','file-input4','file-input5'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  [dz2,dz3,dz4,dz5].forEach(d => d.style.opacity = '.75');
   setScreen('upload');
 }
 </script>
