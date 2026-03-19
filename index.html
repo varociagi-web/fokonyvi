@@ -728,7 +728,7 @@ FONTOS:
 - Csak azokat a partnereket vedd bele, ahol rendezetlen > 0
 - A "nev" mező pontosan a dokumentumban szereplő partnernév legyen
 - Az összegek forintban szerepeljenek (ne eFt-ban)
-- Rendezd csökkenő sorrendbe rendezetlen összeg szerint`;
+- Rendezd csökkenő sorrendbe a rendezetlen összeg nagysága szerint (legnagyobb felül)`;
 }
   if (!v || isNaN(v)) return '—';
   const eFt = Math.round(v / 1000);
@@ -1077,7 +1077,7 @@ function renderPartnerTab(data, tipus) {
   if (!data || !data.partnerek) return '';
   const isVevo = tipus === 'vevo';
   const tabId = isVevo ? 'cv_vevo' : 'cv_szall';
-  const partnerek = data.partnerek || [];
+  const partnerek = (data.partnerek || []).sort((a, b) => (b.rendezetlen || 0) - (a.rendezetlen || 0));
   const szin = isVevo ? '#1D6FA4' : '#8B4513';
   const szinLight = isVevo ? '#E6F1FB' : '#FAECE7';
   const szinBorder = isVevo ? '#B5D4F4' : '#F5C4B3';
