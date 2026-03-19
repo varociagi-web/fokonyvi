@@ -558,6 +558,19 @@ function buildPromptFokonyv(notes, hasComparison) {
 
   return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.${notesSection}${compSection}
 
+KRITIKUS SZÁMVITELI SZABÁLYOK — ezeket soha ne sértsd meg:
+- Az ÁRBEVÉTEL a 91-es (és 93-as export) számlák EGYENLEG oszlopának KÖVETEL értéke — NEM a forgalom!
+- Az EGYÉB BEVÉTEL a 96-os számla EGYENLEG KÖVETEL értéke
+- A PÉNZÜGYI BEVÉTEL a 97-es számla EGYENLEG KÖVETEL értéke
+- A KIADÁSOK az 5-ös számlák EGYENLEG TARTOZIK értékei összesítve
+- A RÁFORDÍTÁSOK a 8-as számlák EGYENLEG TARTOZIK értékei összesítve (KIVA/TAO is)
+- SOHA ne használd a FORGALOM oszlop adatait bevétel/kiadás kiszámításához — azok tartalmazzák a mérlegszámlák mozgásait is, és félrevezető milliárdos összegeket adnak!
+- A PÉNZESZKÖZÖK a 38-as számlacsoport EGYENLEG értéke — ha a bankszámlán folyószámlahitel van (pl. Széchenyi hitelkeret), az egyenleg NEGATÍV is lehet
+- A VEVŐKÖVETELÉS a 31-es számlák egyenlege (311 belföldi, 312/316/317 devizás/külföldi) — NEM a 36-os egyéb követelések (pl. 3612 tagnak adott kölcsön nem vevőkövetelés!)
+- A SZÁLLÍTÓI TARTOZÁS kizárólag a 454-es számla egyenlege — a rövid lejáratú hiteleket (452) NEM tartalmazza
+- Az EREDMÉNY ELŐJELE: ha az 5-9 számlaosztály egyenlege TARTOZIK oldalon van → VESZTESÉG (negatív szám); ha KÖVETEL oldalon → NYERESÉG (pozitív szám)
+- Ellenőrzés: Eredmény = Bevételek összesen − Kiadások összesen; ha negatív → a "eredmeny" mező értéke negatív szám legyen
+
 FONTOS SZABÁLYOK:
 - Minden magyarázat tárgyilagos és tényszerű legyen
 - Ne használj minősítő jelzőket (pl. "egészséges", "kedvező", "kiemelkedő", "szilárd")
@@ -582,34 +595,38 @@ JSON STRUKTÚRA:
   "idoszak": "pontosan a főkönyvből kiolvasott időszak",
   "adoalany_tipusa": "KIVA vagy TAO vagy egyéb",
   "kpi": {
-    "arbevetal": 0,
-    "egyeb_bevetel": 0,
-    "oszes_kiad": 0,
-    "eredmeny": 0,
-    "penzeszkoz": 0,
-    "vevo_kovetel": 0,
-    "szallito_tar": 0,
-    "nav_tartozas": 0,
-    "kiva_osszeg": 0,
-    "hipa_osszeg": 0,
-    "osszes_ado": 0
+    "arbevetal": "91+93 számlák EGYENLEG KÖVETEL értéke összesítve",
+    "egyeb_bevetel": "96+97 számlák EGYENLEG KÖVETEL értéke összesítve",
+    "oszes_kiad": "5-ös számlák EGYENLEG TARTOZIK + 8-as számlák EGYENLEG TARTOZIK összege",
+    "eredmeny": "arbevetal + egyeb_bevetel - oszes_kiad (negatív ha veszteség!)",
+    "penzeszkoz": "38-as számlacsoport EGYENLEG — pénztár+valuta+bankok NETTÓ értéke (lehet negatív!)",
+    "vevo_kovetel": "31-es számlák EGYENLEG összesítve (311+312+316+317)",
+    "szallito_tar": "454-es számla EGYENLEG KÖVETEL értéke",
+    "nav_tartozas": "46-os számlacsoport adójellegű kötelezettségeinek összege (462+463+465+467+469 stb.)",
+    "kiva_osszeg": "89-es számla (KIVA) EGYENLEG TARTOZIK értéke",
+    "hipa_osszeg": "469-es számlacsoport EGYENLEG TARTOZIK értéke összesítve",
+    "osszes_ado": "kiva_osszeg + hipa_osszeg"
   },
   "elozoidoszak": null,
   "valtozas": null,
   "koltsegek": [
-    {"nev": "Közvetített szolgáltatás", "osszeg": 0},
-    {"nev": "Anyagköltség", "osszeg": 0},
-    {"nev": "Bérköltség", "osszeg": 0},
-    {"nev": "Igénybe vett szolgáltatások", "osszeg": 0},
-    {"nev": "Értékcsökkentés", "osszeg": 0},
-    {"nev": "KIVA / TAO adó", "osszeg": 0},
-    {"nev": "Egyéb ráfordítások", "osszeg": 0}
+    {"nev": "Közvetített szolgáltatás", "osszeg": "815-ös számla egyenleg"},
+    {"nev": "ELÁBÉ", "osszeg": "814-es számla egyenleg (ha van)"},
+    {"nev": "Anyagköltség", "osszeg": "51-es számlacsoport egyenleg"},
+    {"nev": "Bérköltség", "osszeg": "54-es számla egyenleg"},
+    {"nev": "Igénybe vett szolgáltatások", "osszeg": "52-es számlacsoport egyenleg"},
+    {"nev": "Egyéb szolgáltatások", "osszeg": "53-as számlacsoport egyenleg"},
+    {"nev": "Személyi egyéb kifizetések", "osszeg": "55-ös számlacsoport egyenleg"},
+    {"nev": "Értékcsökkentés", "osszeg": "57-es számla egyenleg (ha az 5-ös számlák közt szerepel)"},
+    {"nev": "KIVA / TAO adó", "osszeg": "89-es számla egyenleg"},
+    {"nev": "Egyéb ráfordítások", "osszeg": "86-os számla egyenleg"},
+    {"nev": "Pénzügyi ráfordítások", "osszeg": "87-es számla egyenleg"}
   ],
   "penzeszk": [
-    {"nev": "Devizaszámla", "osszeg": 0},
-    {"nev": "HUF bankszámla", "osszeg": 0},
-    {"nev": "Pénztár", "osszeg": 0},
-    {"nev": "Egyéb", "osszeg": 0}
+    {"nev": "Devizaszámla", "osszeg": "382+386 számlák egyenlege"},
+    {"nev": "HUF bankszámla", "osszeg": "384-es számla egyenlege (negatív ha hitelkeret!)"},
+    {"nev": "Pénztár", "osszeg": "381-es számla egyenlege"},
+    {"nev": "Átvezetési", "osszeg": "389-es számla egyenlege ha van"}
   ],
   "hipa_telephelyek": [
     {"nev": "Telephely / önkormányzat neve", "kotelezettseg": 0, "eloleleg": 0, "egyenleg": 0}
@@ -633,13 +650,19 @@ function buildPromptEredmeny(notes) {
   const notesSection = notes && notes.trim()
     ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — az elemzés készítésekor ezeket teljes egészében vedd figyelembe:\n${notes.trim()}\n`
     : '';
-  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt eredménykimutatást és adj vissza KIZÁRÓLAG egy valid JSON objektumot.${notesSection}
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt havi eredménykimutatást és adj vissza KIZÁRÓLAG egy valid JSON objektumot.${notesSection}
 
-FONTOS SZABÁLYOK:
-- Minden magyarázat tárgyilagos és tényszerű legyen, minősítő jelzők nélkül
-- A havi adatokat pontosan olvasd ki a dokumentumból
+A dokumentum formátuma: sorok = tételek (91 Árbevétel, 52 Igénybe vett szolg., stb.), oszlopok = hónapok + Összesen.
+
+KRITIKUS SZABÁLYOK:
+- Az értékeket pontosan a táblázatból olvasd ki — ne számolj, ne becsülj
+- Az eredmény előjele: ha a bevétel nagyobb mint a kiadás → pozitív; ha kisebb → negatív (veszteség)
+- A "bevetel" mezőbe csak a 9-es számlák (91, 96, 97) összege kerüljön
+- A "kiad_mukodesi" mezőbe az 5-ös számlák összege kerüljön (51–58)
+- A "kiad_raforditas" mezőbe a 8-as számlák összege kerüljön (81, 86, 87, 89)
+- Az "eredmeny" = bevetel − kiad_mukodesi − kiad_raforditas (lehet negatív!)
+- Minden szöveg magyarul legyen, minősítő jelzők nélkül
 - Ha nem minden hónap szerepel (évközi kimutatás), csak a meglévő hónapokat add vissza
-- A szöveg laikusok számára is érthető legyen
 
 JSON STRUKTÚRA:
 {
@@ -666,11 +689,11 @@ JSON STRUKTÚRA:
     }
   ],
   "szoveg": {
-    "osszesito": "2-3 tárgyilagos mondat az időszak összesített eredményéről. Konkrét számok.",
-    "trend": "A havi eredmény alakulásának tárgyilagos leírása — mikor volt pozitív, mikor negatív, mi jellemzi az ingadozást.",
+    "osszesito": "2-3 tárgyilagos mondat az időszak összesített eredményéről. Konkrét számok. Ha veszteség, azt egyértelműen jelezd.",
+    "trend": "A havi eredmény alakulásának tárgyilagos leírása.",
     "legjobb_honap": "A legjobb eredményű hónap neve és eredménye számmal.",
-    "leggyengebb_honap": "A leggyengébb (legalacsonyabb vagy legnegatívabb) eredményű hónap neve és eredménye számmal.",
-    "koltségstruktura": "A működési kiadások fő tételeinek tárgyilagos leírása az időszakra összesítve.",
+    "leggyengebb_honap": "A leggyengébb eredményű hónap neve és eredménye számmal.",
+    "koltségstruktura": "A működési kiadások fő tételeinek tárgyilagos leírása.",
     "ado": "Az adóteher tárgyilagos ismertetése — összeg és típus."
   }
 }`;
@@ -679,56 +702,69 @@ JSON STRUKTÚRA:
 function buildPromptHavi() {
   return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt havi eredménykimutatást és adj vissza KIZÁRÓLAG egy valid JSON objektumot.
 
-A dokumentumból kinyered az összes sort (bevétel és kiadás sorok) és minden hónapra az értéket.
+A dokumentum formátuma: sorok = könyvelési tételek (pl. "91 Árbevétel", "54 Bérköltség"), oszlopok = hónapok + Összesen.
+Minden cella egy konkrét forint összeg (vagy üres/nulla).
+
+KRITIKUS SZABÁLYOK:
+- Az értékeket PONTOSAN a táblázatból olvasd ki — minden sort, minden hónapot
+- Az "ertekek" tömbben CSAK a meglévő hónapok szerepeljenek (ne tölts fel nullákkal nem létező hónapokat)
+- A "honapok" lista pontosan annyi elemet tartalmazzon, ahány oszlop van a táblázatban
+- A "tipus" mező szabályai: 9-es számlák → "bevetel", 5-ös számlák → "mukodesi_kiad", 8-as számlák → "raforditas"
+- Összesítő sorokat is vedd bele: "Bevétel összesen" → "osszesito_bevetel", "Kiadás összesen" → "osszesito_kiad", "Eredmény összesen" → "osszesito_eredmeny"
+- Az eredmény lehet NEGATÍV — ha a kiadások meghaladják a bevételeket, negatív számot adj vissza
+- Az osszesito.eredmeny_honapok értékei is lehetnek negatívak
 
 JSON STRUKTÚRA:
 {
-  "idoszak": "pl. 2025. január – december",
-  "honapok": ["január","február","március","április","május","június","július","augusztus","szeptember","október","november","december"],
+  "idoszak": "pl. 2025. január – március",
+  "honapok": ["január","február","március"],
   "sorok": [
     {
       "kod": "91",
       "nev": "Árbevétel",
       "tipus": "bevetel",
-      "ertekek": [0,0,0,0,0,0,0,0,0,0,0,0],
+      "ertekek": [0, 0, 0],
       "osszesen": 0
     }
   ],
   "osszesito": {
-    "bevetel_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
-    "kiad_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
-    "eredmeny_honapok": [0,0,0,0,0,0,0,0,0,0,0,0],
+    "bevetel_honapok": [0, 0, 0],
+    "kiad_honapok": [0, 0, 0],
+    "eredmeny_honapok": [0, 0, 0],
     "bevetel_total": 0,
     "kiad_total": 0,
     "eredmeny_total": 0
   }
-}
-
-FONTOS:
-- A "tipus" mező értéke: "bevetel" (9-es számlák), "mukodesi_kiad" (5-es számlák), "raforditas" (8-as számlák)
-- Az "ertekek" tömb pontosan annyi elemet tartalmazzon, ahány hónap van a dokumentumban
-- Ha egy cellában 0 vagy üres érték van, azt 0-ként add vissza
-- A sorok között szerepeljen az összes sor amit a dokumentumban látsz (összesítő sorok is)
-- Az összesítő soroknál a "tipus" legyen "osszesito_bevetel", "osszesito_kiad" vagy "osszesito_eredmeny"`;
+}`;
 }
 
 function buildPromptPartner(tipus) {
-  const leiras = tipus === 'vevo'
-    ? 'vevőkövetelések (kimenő számlákat tartalmazó pénzügyi nyilvántartás)'
-    : 'szállítói tartozások (bejövő számlákat tartalmazó pénzügyi nyilvántartás)';
-  const mezok = tipus === 'vevo'
-    ? '"osszesen_brutto": 0, "osszesen_rendezetlen": 0'
-    : '"osszesen_brutto": 0, "osszesen_rendezetlen": 0';
+  const isVevo = tipus === 'vevo';
+  const leiras = isVevo
+    ? 'vevőkövetelések (Pénzügyi Nyilvántartás — kimenő számlák listája)'
+    : 'szállítói tartozások (Pénzügyi Nyilvántartás — bejövő számlák listája)';
 
   return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt ${leiras} dokumentumot és adj vissza KIZÁRÓLAG egy valid JSON objektumot.
 
-A dokumentumban partnerenként szerepelnek a tételek, minden partnerhez tartozik egy "Összesen" és "Rendezetlen" összeg.
+A dokumentum szerkezete:
+- Partnerenként csoportosított számlalista
+- Minden partner végén: "Összesen:" (az összes számla bruttó összege) és "Rendezetlen:" (a még ki nem fizetett összeg)
+- A dokumentum végén: "MINDÖSSZESEN" és "RENDEZETLEN" — ezek a teljes összesítők
 
-STÁTUSZ meghatározása:
-- Ha a rendezetlen összeg > 0 ÉS a számlák kelte régebbi mint 30 napja → "lejart"
-- Ha a rendezetlen összeg > 0 ÉS a számlák frissek (aktuális hónap) → "folyo"
-- Ha az összesen > rendezetlen (tehát részben rendezett) → "reszben"
-- Ha rendezetlen = 0 → ne szerepeljen a listában
+KRITIKUS SZABÁLYOK:
+- Az "osszesen_brutto" az utolsó "MINDÖSSZESEN" sorból jön (bruttó oszlop)
+- Az "osszesen_rendezetlen" az utolsó "RENDEZETLEN" sorból jön
+- Minden partnernél az "osszesen_brutto" az "Összesen:" sor bruttó értéke
+- Minden partnernél a "rendezetlen" a "Rendezetlen:" sor értéke
+- Ha egy partner "Rendezetlen:" sora 0 vagy üres → NE szerepeljen a listában
+- Az összegek forintban szerepeljenek (ne eFt-ban) — pontosan ahogy a dokumentumban van
+- Rendezd csökkenő sorrendbe a "rendezetlen" összeg szerint (legnagyobb felül)
+
+STÁTUSZ meghatározása a számlák dátuma alapján:
+- "lejart": a fizetési határidő (Fiz.hat. oszlop) már elmúlt ÉS rendezetlen > 0
+- "folyo": a fizetési határidő még nem múlt el ÉS rendezetlen > 0
+- "reszben": összesen > rendezetlen (tehát részben már fizettek, de van még nyitott tétel)
+- Ha egy partnernél vegyes (van lejárt és folyó számla is) → "reszben" státusz
 
 JSON STRUKTÚRA:
 {
@@ -737,20 +773,14 @@ JSON STRUKTÚRA:
   "osszesen_rendezetlen": 0,
   "partnerek": [
     {
-      "nev": "Partner neve",
+      "nev": "Partner neve pontosan ahogy a dokumentumban szerepel (zárójelben lévő számot NE vedd bele)",
       "osszesen_brutto": 0,
       "rendezetlen": 0,
       "statusz": "lejart | folyo | reszben",
-      "megjegyzes": "pl. számla típusa ha feltűnő (Adminisztráció, Könyvelési díj stb.)"
+      "megjegyzes": "a számla tárgya/típusa ha releváns (pl. Könyvelési díj, Adminisztráció, Anyagbeszerzés)"
     }
   ]
-}
-
-FONTOS:
-- Csak azokat a partnereket vedd bele, ahol rendezetlen > 0
-- A "nev" mező pontosan a dokumentumban szereplő partnernév legyen
-- Az összegek forintban szerepeljenek (ne eFt-ban)
-- Rendezd csökkenő sorrendbe a rendezetlen összeg nagysága szerint (legnagyobb felül)`;
+}`;
 }
 
 function fmtM(v) {
