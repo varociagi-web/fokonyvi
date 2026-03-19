@@ -554,10 +554,17 @@ FONTOS SZABÁLYOK:
 - Ne használj minősítő jelzőket (pl. "egészséges", "kedvező", "kiemelkedő", "szilárd")
 - Csak számokat, arányokat, tényeket és összefüggéseket írj
 - A szöveg laikusok számára is érthető legyen, de szakmailag pontos
-- Az "idoszak" mezőbe pontosan azt írd, amit a főkönyvben találsz (pl. "2025. január 1. – március 31." ha negyedéves, "2025. január 1. – december 31." ha éves)
-- Az összes szöveges magyarázatban az időszakra vonatkozó kifejezéseknél NE használj "éves" szót ha az időszak nem egy teljes év — helyette mondd: "az időszak árbevétele", "a vizsgált időszakban"
+- Az "idoszak" mezőbe pontosan azt írd, amit a főkönyvben találsz
+- Az összes szöveges magyarázatban NE használj "éves" szót ha az időszak nem egy teljes év — helyette: "az időszak árbevétele", "a vizsgált időszakban"
 - A HIPA-nál NE írd le a számítási módszert — csak a tényleges számokat közöld
 - A HIPA alapjának kiszámítása a bevallásból derül ki — erről ne írj semmit
+- A KIVA adókulcsa 10% — ezt soha ne írd másképp (nem 1%, nem 2%)
+- A KPI "oszes_kiad" mezőbe az ÖSSZES kiadás kerüljön: működési kiadások (5-ös számlák) + ráfordítások (8-as számlák) + adók (89 számla) összesen
+- A KPI "arbevetal" csak a tényleges értékesítési árbevételt tartalmazza (91-es számlák)
+- A KPI "egyeb_bevetel" az egyéb és pénzügyi bevételeket tartalmazza (96, 97-es számlák)
+- A header összefoglalóban a bevétel KPI az ÁRBEVÉTELT mutassa (nem az összes bevételt)
+- Minden szöveg magyarul legyen — ne használj angol szavakat (pl. "cost" helyett "kiadás")
+- A kiva_magyarazat mezőben a KIVA kulcsát mindig 10%-ként írd
 
 JSON STRUKTÚRA:
 {
@@ -787,12 +794,12 @@ function openPrintView() {
     'document.querySelectorAll(".cr-tab").forEach(b=>b.classList.add("on"));',
     'function fmtM(v){if(!v||isNaN(v))return"\u2014";if(Math.abs(v)>=1000000000)return(v/1000000000).toLocaleString("hu-HU",{maximumFractionDigits:2})+" Mrd Ft";return Math.round(v/1000).toLocaleString("hu-HU")+" eFt";}',
     'var d=' + JSON.stringify(d) + ';',
-    'var k=d.kpi||{};var kl=(d.koltsegek||[]).filter(c=>c.osszeg>0).sort((a,b)=>b.osszeg-a.osszeg);var pe=(d.penzeszk||[]).filter(p=>p.osszeg>0);',
+    'var k=d.kpi||{};var osszesBev=(k.arbevetal||0)+(k.egyeb_bevetel||0);var kl=(d.koltsegek||[]).filter(c=>c.osszeg>0).sort((a,b)=>b.osszeg-a.osszeg);var pe=(d.penzeszk||[]).filter(p=>p.osszeg>0);',
     'var kC=["#D85A30","#E24B4A","#BA7517","#EF9F27","#534AB7","#888780","#B4B2A9"];var gc="rgba(107,62,38,.1)";',
     'function tryC(id,cfg){var el=document.getElementById(id);if(el)new Chart(el,cfg);}',
     'function bO(labels,data,colors){return{type:"bar",data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtM(c.raw)}}},scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}}};}',
-    'tryC("cv1",bO(["Árbevétel","Kiadás"],[k.arbevetal,k.oszes_kiad],["#14917F","#D85A30"]));',
-    'tryC("cv2",bO(["Bevétel","Kiadás","Eredmény"],[k.arbevetal,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
+    'tryC("cv1",bO(["Összes bevétel","Kiadás"],[osszesBev,k.oszes_kiad],["#14917F","#D85A30"]));',
+    'tryC("cv2",bO(["Bevétel","Kiadás","Eredmény"],[osszesBev,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
     'if(kl.length)tryC("cv3",{type:"doughnut",data:{labels:kl.map(c=>c.nev),datasets:[{data:kl.map(c=>c.osszeg),backgroundColor:kC,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"54%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
     'if(pe.length)tryC("cv4",{type:"doughnut",data:{labels:pe.map(p=>p.nev),datasets:[{data:pe.map(p=>p.osszeg),backgroundColor:["#14917F","#1DB399","#5ECBB8","#A0DDD4"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
     '</' + sc + '>',
@@ -1169,7 +1176,8 @@ function renderReport(d) {
   const hipa = d.hipa_telephelyek || [];
   const maxK = koltsegek[0]?.osszeg || 1;
   const kColors = ['#D85A30','#E24B4A','#BA7517','#EF9F27','#534AB7','#888780','#B4B2A9'];
-  const marzs = k.arbevetal > 0 ? Math.round(k.eredmeny / k.arbevetal * 100) : 0;
+  const osszesBev = (k.arbevetal || 0) + (k.egyeb_bevetel || 0);
+  const marzs = osszesBev > 0 ? Math.round(k.eredmeny / osszesBev * 100) : 0;
   const today = new Date().toLocaleDateString('hu-HU', {year:'numeric',month:'long',day:'numeric'});
   const idoszakLabel = d.idoszak || '—';
   const hasPrev = !!prev;
@@ -1218,8 +1226,8 @@ function renderReport(d) {
       </div>
     </div>
     <div class="cr-kpi-row">
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Bevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">értékesítés + egyéb</div></div>
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési cost</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Árbevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">alaptevékenység</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési + ráfordítás</div></div>
       <div class="cr-kpi"><div class="cr-kpi-lbl">Eredmény</div><div class="cr-kpi-val">${fmtM(k.eredmeny)}</div><div class="cr-kpi-sub ${k.eredmeny>=0?'pos':'neg'}">${marzs}% marzs</div></div>
       <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA/TAO + HIPA + egyéb</div></div>
     </div>
@@ -1304,7 +1312,7 @@ function renderReport(d) {
 
   <div id="c5" class="cr-sec">
     <div class="cr-sec-title"><span class="cr-sec-num ado">5</span>Adók részletesen</div>
-    <div class="ins purple">Az év során a cég összesen <b>${fmtM(k.osszes_ado)}</b> adót fizetett különböző jogcímeken — ez a bevétel ${pct(k.osszes_ado, k.arbevetal)}-a. Az alábbiakban ez tételesen szerepel.</div>
+    <div class="ins purple">Az időszakban a cég összesen <b>${fmtM(k.osszes_ado)}</b> adót fizetett különböző jogcímeken — ez az összes bevétel ${pct(k.osszes_ado, osszesBev)}-a. Az alábbiakban ez tételesen szerepel.</div>
 
     <div class="ado-card">
       <div class="ado-card-title">KIVA — Kisvállalati adó <span class="ado-badge">${d.adoalany_tipusa || 'KIVA'}-alany</span></div>
@@ -1368,8 +1376,8 @@ function renderReport(d) {
         scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}
       }
     });
-    tryC('cv1', barOpts(['Árbevétel','Kiadás'],[k.arbevetal,k.oszes_kiad],['#14917F','#D85A30']));
-    tryC('cv2', barOpts(['Bevétel','Kiadás','Eredmény'],[k.arbevetal,k.oszes_kiad,k.eredmeny],['#14917F','#D85A30',k.eredmeny>=0?'#0D5C54':'#A32D2D']));
+    tryC('cv1', barOpts(['Összes bevétel','Kiadás'],[osszesBev,k.oszes_kiad],['#14917F','#D85A30']));
+    tryC('cv2', barOpts(['Bevétel','Kiadás','Eredmény'],[osszesBev,k.oszes_kiad,k.eredmeny],['#14917F','#D85A30',k.eredmeny>=0?'#0D5C54':'#A32D2D']));
     if (koltsegek.length) tryC('cv3', {
       type: 'doughnut',
       data: { labels: koltsegek.map(c=>c.nev), datasets: [{ data: koltsegek.map(c=>c.osszeg), backgroundColor: kColors, borderWidth: 0 }] },
@@ -1486,14 +1494,15 @@ function downloadHTML() {
     '(function(){',
     'var d=' + dataStr + ';',
     'var k=d.kpi||{};',
+    'var osszesBev=(k.arbevetal||0)+(k.egyeb_bevetel||0);',
     'var kl=(d.koltsegek||[]).filter(c=>c.osszeg>0).sort((a,b)=>b.osszeg-a.osszeg);',
     'var pe=(d.penzeszk||[]).filter(p=>p.osszeg>0);',
     'var kC=["#D85A30","#E24B4A","#BA7517","#EF9F27","#534AB7","#888780","#B4B2A9"];',
     'var gc="rgba(107,62,38,.1)";',
     'function tryC(id,cfg){var el=document.getElementById(id);if(el)new Chart(el,cfg);}',
     'function bOpt(labels,data,colors){return{type:"bar",data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtM(c.raw)}}},scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}}};}',
-    'tryC("cv1",bOpt(["Árbevétel","Kiadás"],[k.arbevetal,k.oszes_kiad],["#14917F","#D85A30"]));',
-    'tryC("cv2",bOpt(["Bevétel","Kiadás","Eredmény"],[k.arbevetal,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
+    'tryC("cv1",bOpt(["Összes bevétel","Kiadás"],[osszesBev,k.oszes_kiad],["#14917F","#D85A30"]));',
+    'tryC("cv2",bOpt(["Bevétel","Kiadás","Eredmény"],[osszesBev,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
     'if(kl.length)tryC("cv3",{type:"doughnut",data:{labels:kl.map(c=>c.nev),datasets:[{data:kl.map(c=>c.osszeg),backgroundColor:kC,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"54%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
     'if(pe.length)tryC("cv4",{type:"doughnut",data:{labels:pe.map(p=>p.nev),datasets:[{data:pe.map(p=>p.osszeg),backgroundColor:["#14917F","#1DB399","#5ECBB8","#A0DDD4"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
     '})();',
