@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SukorADÓ · Főkönyvi elemző</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --br9:#2C1810;--br8:#4A2C1A;--br7:#6B3E26;--br6:#8B5E3C;
+  --br5:#A67C52;--br4:#C49A6C;--br3:#D4B896;--br2:#E8D5C0;
+  --br1:#F5EDE3;--br0:#FAF6F1;
+  --tl7:#0D5C54;--tl6:#0F7268;--tl5:#14917F;--tl4:#1DB399;
+  --tl3:#5ECBB8;--tl2:#A0DDD4;
+  --tx:#1A0F08;--txm:#5C3D25;--txs:#9B7355;
+  --bd:#D4B896;--bdl:#EAD9C8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-height:100vh}
+
+.site-header{background:var(--br9);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100}
+.logo{font-family:'Lora',serif;font-size:18px;font-weight:600;color:var(--br3);letter-spacing:.02em}
+.logo span{color:var(--tl4)}
+.header-tag{font-size:11px;color:var(--br6);letter-spacing:.07em;text-transform:uppercase}
+
+/* SCREENS */
+#screen-upload{max-width:600px;margin:4rem auto;padding:0 1.5rem}
+#screen-processing{max-width:460px;margin:6rem auto;padding:0 1.5rem;text-align:center;display:none}
+#screen-result{display:none}
+
+/* UPLOAD */
+.upload-headline{font-family:'Lora',serif;font-size:24px;font-weight:500;color:var(--br8);margin-bottom:.5rem}
+.upload-sub{font-size:14px;color:var(--txs);margin-bottom:2rem;line-height:1.65}
+.upload-zone{border:2px dashed var(--br3);border-radius:16px;background:white;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--tl4);background:var(--tl0, #EEF9F7)}
+.upload-zone input{display:none}
+.uz-icon{width:54px;height:54px;background:var(--br1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.uz-icon svg{width:24px;height:24px;stroke:var(--br6);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.uz-title{font-size:15px;font-weight:500;color:var(--br8);margin-bottom:5px}
+.uz-hint{font-size:13px;color:var(--txs)}
+.uz-formats{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.uz-fmt{background:var(--br1);border:1px solid var(--bdl);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--txm);font-weight:500}
+
+.field-box{margin-top:1.25rem;background:white;border:1px solid var(--bdl);border-radius:12px;padding:1.25rem}
+.field-label{font-size:13px;font-weight:500;color:var(--txm);display:block;margin-bottom:6px}
+.field-hint{font-size:11px;color:var(--txs);margin-top:5px;line-height:1.5}
+.field-input{width:100%;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--tx);background:var(--br0);outline:none;transition:border-color .15s}
+.field-input:focus{border-color:var(--tl5)}
+
+.btn-row{margin-top:1.25rem;display:flex;gap:10px;flex-wrap:wrap}
+.btn-primary{background:var(--br8);color:var(--br1);border:none;padding:11px 24px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.btn-primary:hover{background:var(--br7)}
+.btn-secondary{background:transparent;color:var(--br6);border:1px solid var(--bd);padding:11px 16px;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-secondary:hover{background:var(--br1)}
+.error-msg{margin-top:10px;font-size:13px;color:#993C1D;display:none;padding:.6rem .9rem;background:#FAECE7;border-radius:8px;border-left:3px solid #D85A30}
+
+/* PROCESSING */
+.spinner{width:44px;height:44px;border:3px solid var(--br2);border-top-color:var(--tl5);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc-title{font-family:'Lora',serif;font-size:19px;color:var(--br8);margin-bottom:.5rem}
+.proc-sub{font-size:13px;color:var(--txs);line-height:1.6}
+.steps{margin-top:1.5rem;text-align:left;background:white;border:1px solid var(--bdl);border-radius:12px;padding:1rem}
+.step{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;color:var(--txs);border-bottom:1px solid var(--bdl)}
+.step:last-child{border-bottom:none}
+.step.done{color:var(--tl6)}.step.active{color:var(--br7);font-weight:500}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--bdl);flex-shrink:0}
+.step.done .step-dot{background:var(--tl5)}
+.step.active .step-dot{background:var(--br5);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* RESULT BAR */
+.result-bar{background:var(--br8);padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:58px;z-index:90}
+.result-info{font-size:13px;color:var(--br3)}
+.result-info strong{color:white}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-dl{background:var(--tl5);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:background .15s}
+.btn-dl:hover{background:var(--tl6)}
+.btn-dl svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-reset{background:transparent;color:var(--br3);border:1px solid var(--br6);padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-reset:hover{background:var(--br7)}
+.btn-print{background:var(--br6);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px}
+.btn-print svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+#client-preview{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+/* ── CLIENT REPORT STYLES ── */
+.cr-wrap{font-family:'DM Sans',sans-serif;color:var(--tx)}
+.cr-hdr{background:linear-gradient(135deg,var(--br9) 0%,var(--br8) 55%,var(--br7) 100%);border-radius:18px;padding:2.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.cr-hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(20,145,127,.12)}
+.cr-hdr::after{content:'';position:absolute;bottom:-30px;left:30px;width:120px;height:120px;border-radius:50%;background:rgba(196,154,108,.07)}
+.cr-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;position:relative}
+.cr-brand{font-family:'Lora',serif;font-size:12px;color:var(--br4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.cr-cegnev{font-family:'Lora',serif;font-size:22px;font-weight:600;color:#fff;line-height:1.2}
+.cr-meta{font-size:12px;color:var(--br4);margin-top:5px}
+.cr-period{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:.65rem 1.1rem;text-align:right;flex-shrink:0}
+.cr-period-lbl{font-size:10px;color:var(--br4);letter-spacing:.06em;text-transform:uppercase}
+.cr-period-val{font-size:14px;font-weight:500;color:#fff;margin-top:3px}
+.cr-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;position:relative}
+.cr-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.85rem 1rem}
+.cr-kpi-lbl{font-size:10px;color:var(--br4);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.cr-kpi-val{font-size:18px;font-weight:500;color:#fff;line-height:1}
+.cr-kpi-sub{font-size:11px;margin-top:4px}
+.cr-kpi-sub.pos{color:var(--tl3)}.cr-kpi-sub.neg{color:#F0997B}.cr-kpi-sub.neu{color:var(--br3)}
+
+.cr-tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.cr-tab{padding:7px 16px;border-radius:100px;border:1px solid var(--bdl);font-size:13px;cursor:pointer;background:transparent;color:var(--txs);font-family:'DM Sans',sans-serif;transition:all .15s}
+.cr-tab:hover{background:var(--br1);color:var(--br7)}
+.cr-tab.on{background:var(--br8);color:var(--br1);border-color:var(--br8)}
+.cr-tab.ado{border-color:#534AB7;color:#534AB7}
+.cr-tab.ado.on{background:#534AB7;color:#fff;border-color:#534AB7}
+
+.cr-sec{display:none}.cr-sec.on{display:block}
+.cr-sec-title{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--br8);margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:2px solid var(--br2);display:flex;align-items:center;gap:9px}
+.cr-sec-num{width:26px;height:26px;background:var(--br7);color:var(--br1);border-radius:50%;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cr-sec-num.ado{background:#534AB7}
+
+.ins{border-radius:10px;padding:.9rem 1.15rem;margin-bottom:.8rem;font-size:13.5px;line-height:1.75;border-left:3px solid}
+.ins b{font-weight:500}
+.ins.ok{background:#EEF9F7;color:#0D5C54;border-color:#14917F}
+.ins.warn{background:#FAEEDA;color:#5C3300;border-color:#EF9F27}
+.ins.info{background:var(--br0);color:var(--br7);border-color:var(--br4)}
+.ins.bad{background:#FAECE7;color:#7A2E0E;border-color:#D85A30}
+.ins.purple{background:#EEEDFE;color:#3C3489;border-color:#7F77DD}
+
+.mc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem}
+.mc{background:var(--br1);border-radius:10px;padding:.9rem 1rem;border:1px solid var(--bdl)}
+.mc-lbl{font-size:11px;color:var(--txs);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.mc-val{font-size:18px;font-weight:500;color:var(--br8)}
+.mc-sub{font-size:11px;color:var(--txs);margin-top:3px}
+.mc-val.pos{color:#0F7268}.mc-val.neg{color:#C0391B}
+
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:580px){.cg{grid-template-columns:1fr}}
+.cb{background:#fff;border:1px solid var(--bdl);border-radius:12px;padding:1.2rem}
+.cb-title{font-size:13px;font-weight:500;color:var(--br7);margin-bottom:2px}
+.cb-sub{font-size:12px;color:var(--txs);margin-bottom:12px}
+
+.cr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl);font-size:13px}
+.cr-row:last-child{border-bottom:none}
+.cr-row-lbl{flex:1;color:var(--tx)}
+.cr-row-val{font-weight:500;color:var(--br8);min-width:82px;text-align:right;font-variant-numeric:tabular-nums}
+.cr-bw{width:72px;height:5px;background:var(--br1);border-radius:3px;overflow:hidden;flex-shrink:0}
+.cr-bf{height:100%;border-radius:3px}
+
+.lb-row{margin-bottom:12px}
+.lb-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--txm)}
+.lb-track{height:10px;border-radius:5px;background:var(--br1);overflow:hidden}
+.lb-fill{height:100%;border-radius:5px}
+
+.ado-card{background:#fff;border:1px solid #CECBF6;border-radius:14px;padding:1.4rem;margin-bottom:1rem}
+.ado-card-title{font-family:'Lora',serif;font-size:15px;font-weight:600;color:#3C3489;margin-bottom:.3rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ado-badge{display:inline-block;background:#EEEDFE;color:#534AB7;font-size:11px;font-weight:500;padding:2px 9px;border-radius:100px;font-family:'DM Sans',sans-serif}
+.ado-card-sub{font-size:12px;color:#7F77DD;margin-bottom:1rem}
+.ado-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EEEDFE;font-size:13px}
+.ado-row:last-child{border-bottom:none}
+.ado-row-lbl{color:var(--txm)}
+.ado-row-val{font-weight:500;color:#3C3489;font-variant-numeric:tabular-nums}
+.ado-row-val.fizetve{color:#0F7268}
+.ado-row-val.esedek{color:#C0391B}
+.ado-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:2px solid #CECBF6;font-size:14px;font-weight:500}
+.ado-total-lbl{color:#3C3489}
+.ado-total-val{font-size:16px;color:#3C3489}
+
+.hipa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:500px){.hipa-grid{grid-template-columns:1fr}}
+.hipa-card{background:#EEEDFE;border:1px solid #CECBF6;border-radius:10px;padding:.9rem 1rem}
+.hipa-lbl{font-size:11px;color:#7F77DD;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.hipa-val{font-size:17px;font-weight:500;color:#3C3489}
+.hipa-sub{font-size:11px;color:#7F77DD;margin-top:3px}
+
+.kiva-calc{background:#F8F8FE;border:1px solid #CECBF6;border-radius:12px;padding:1.2rem;margin-bottom:1rem}
+.kiva-calc-title{font-size:12px;color:#7F77DD;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;font-weight:500}
+.kiva-sor{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #CECBF6;color:var(--txm)}
+.kiva-sor:last-child{border-bottom:none;font-weight:500;color:#3C3489;font-size:14px;padding-top:8px;margin-top:3px}
+.kiva-sor span:last-child{font-variant-numeric:tabular-nums}
+
+.zarszó{background:var(--br1);border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;font-size:13.5px;color:var(--br7);line-height:1.7;border:1px solid var(--bdl)}
+
+.cr-ftr{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--bdl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.cr-ftr-brand{font-family:'Lora',serif;font-size:15px;color:var(--br6)}
+.cr-ftr-brand span{color:var(--tl6)}
+.cr-ftr-note{font-size:11px;color:var(--txs);max-width:400px;text-align:right;line-height:1.5}
+
+@media print{
+  .site-header,.result-bar,#screen-upload,#screen-processing{display:none!important}
+  #screen-result{display:block!important}
+  #client-preview{max-width:100%;padding:0}
+  .cr-tabs{display:none}
+  .cr-sec{display:block!important}
+  .cr-hdr,.ado-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ins,.mc,.cb,.ado-card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Sukor<span>ADÓ</span></div>
+  <div class="header-tag">Főkönyvi elemző · belső eszköz</div>
+</header>
+
+<!-- UPLOAD -->
+<div id="screen-upload">
+  <div class="upload-headline">Főkönyvi kivonat elemzése</div>
+  <p class="upload-sub">Töltsd fel az ügyfél PDF-jét. A rendszer feldolgozza és elkészíti a laikusok számára is érthető ügyfél-összefoglalót.</p>
+
+  <div class="upload-zone" id="dropzone" onclick="document.getElementById('file-input').click()">
+    <div class="uz-icon">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9,15 12,12 15,15"/></svg>
+    </div>
+    <div class="uz-title" id="uz-title">Kattints ide a feltöltéshez</div>
+    <div class="uz-hint" id="uz-hint">vagy húzd rá a fájlt</div>
+    <div class="uz-formats"><span class="uz-fmt">PDF</span><span class="uz-fmt">XLSX</span></div>
+    <input type="file" id="file-input" accept=".pdf,.xlsx,.xls">
+  </div>
+
+  <div class="field-box">
+    <label class="field-label">Anthropic API kulcs</label>
+    <input class="field-input" type="password" id="api-key" placeholder="sk-ant-...">
+    <div class="field-hint">A kulcs csak a böngésződben tárolódik, a szerverre nem kerül fel. Igényelni: console.anthropic.com</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="startAnalysis()">Elemzés indítása →</button>
+  </div>
+  <div class="error-msg" id="error-msg"></div>
+</div>
+
+<!-- PROCESSING -->
+<div id="screen-processing">
+  <div class="spinner"></div>
+  <div class="proc-title">Elemzés folyamatban…</div>
+  <p class="proc-sub">A Claude AI olvassa a főkönyvi kivonatot és generálja a magyarázatokat.</p>
+  <div class="steps">
+    <div class="step active" id="ps1"><div class="step-dot"></div>PDF beolvasása</div>
+    <div class="step" id="ps2"><div class="step-dot"></div>Adatok kinyerése</div>
+    <div class="step" id="ps3"><div class="step-dot"></div>Magyarázatok generálása</div>
+    <div class="step" id="ps4"><div class="step-dot"></div>Összefoglaló összeállítása</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result">
+  <div class="result-bar">
+    <div class="result-info">Kész: <strong id="result-fname">—</strong></div>
+    <div class="result-actions">
+      <button class="btn-reset" onclick="resetApp()">← Új elemzés</button>
+      <button class="btn-dl" onclick="downloadHTML()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        HTML letöltése
+      </button>
+      <button class="btn-print" onclick="window.print()">
+        <svg viewBox="0 0 24 24"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Nyomtatás
+      </button>
+    </div>
+  </div>
+  <div id="client-preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let currentData = null;
+let currentFile = null;
+let currentFilename = '';
+
+// Drag & drop
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); setFile(e.dataTransfer.files[0]); });
+document.getElementById('file-input').addEventListener('change', e => setFile(e.target.files[0]));
+
+function setFile(f) {
+  if (!f) return;
+  currentFile = f;
+  currentFilename = f.name;
+  document.getElementById('uz-title').textContent = '✓ ' + f.name;
+  document.getElementById('uz-hint').textContent = 'Fájl betöltve';
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function setScreen(s) {
+  document.getElementById('screen-upload').style.display = s === 'upload' ? '' : 'none';
+  document.getElementById('screen-processing').style.display = s === 'processing' ? 'block' : 'none';
+  document.getElementById('screen-result').style.display = s === 'result' ? 'block' : 'none';
+}
+
+function setStep(n, state) {
+  document.getElementById('ps' + n).className = 'step ' + state;
+}
+
+function resetSteps() {
+  [1,2,3,4].forEach(n => document.getElementById('ps'+n).className = 'step');
+  setStep(1, 'active');
+}
+
+async function startAnalysis() {
+  const apiKey = document.getElementById('api-key').value.trim();
+  document.getElementById('error-msg').style.display = 'none';
+  if (!apiKey) { showError('Add meg az Anthropic API kulcsot.'); return; }
+  if (!currentFile) { showError('Tölts fel egy PDF vagy Excel fájlt.'); return; }
+  setScreen('processing');
+  resetSteps();
+  try {
+    const base64 = await toBase64(currentFile);
+    setStep(1, 'done'); setStep(2, 'active');
+
+    const prompt = buildPrompt();
+    setStep(2, 'done'); setStep(3, 'active');
+
+    const ext = currentFile.name.split('.').pop().toLowerCase();
+    let msgContent;
+    if (ext === 'pdf') {
+      msgContent = [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+        { type: 'text', text: prompt }
+      ];
+    } else {
+      msgContent = [{ type: 'text', text: prompt + '\n\nMegjegyzés: Excel fájl érkezett, de szövegként nem olvasható be. Kérlek generálj demo adatokat a struktúra bemutatásához.' }];
+    }
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: msgContent }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || 'API hiba (' + resp.status + ')');
+    }
+
+    const result = await resp.json();
+    const raw = result.content[0].text;
+    setStep(3, 'done'); setStep(4, 'active');
+
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Nem sikerült JSON választ kapni. Próbáld újra.');
+    currentData = JSON.parse(match[0]);
+
+    setStep(4, 'done');
+    await sleep(500);
+    renderReport(currentData);
+    setScreen('result');
+    document.getElementById('result-fname').textContent = currentFilename;
+  } catch(e) {
+    setScreen('upload');
+    showError('Hiba: ' + e.message);
+  }
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Fájl olvasási hiba'));
+    r.readAsDataURL(file);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function buildPrompt() {
+  return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.
+
+FONTOS SZABÁLYOK a szövegezéshez:
+- Minden magyarázat tárgyilagos és tényszerű legyen
+- Ne használj minősítő jelzőket (pl. "egészséges", "kedvező", "kiemelkedő", "szilárd")
+- Csak számokat, arányokat, definíciókat és összefüggéseket írj
+- A szöveg laikusok számára is érthető legyen, de szakmailag pontos
+- A HIPA (helyi iparűzési adó) alapja a KIVA-alap 120%-a — ezt vedd figyelembe
+
+JSON STRUKTÚRA:
+{
+  "ceg": "cég teljes neve",
+  "adoszam": "adószám",
+  "idoszak": "pl. 2025. január 1. – december 31.",
+  "kpi": {
+    "arbevetal": 0,
+    "egyeb_bevetel": 0,
+    "oszes_kiad": 0,
+    "eredmeny": 0,
+    "penzeszkoz": 0,
+    "vevo_kovetel": 0,
+    "szallito_tar": 0,
+    "nav_tartozas": 0,
+    "kiva_osszeg": 0,
+    "hipa_osszeg": 0,
+    "osszes_ado": 0,
+    "kiva_alap": 0
+  },
+  "koltsegek": [
+    {"nev": "Közvetített szolgáltatás", "osszeg": 0},
+    {"nev": "Anyagköltség", "osszeg": 0},
+    {"nev": "Bérköltség", "osszeg": 0},
+    {"nev": "Igénybe vett szolgáltatások", "osszeg": 0},
+    {"nev": "Értékcsökkentés", "osszeg": 0},
+    {"nev": "KIVA adó", "osszeg": 0},
+    {"nev": "Egyéb ráfordítások", "osszeg": 0}
+  ],
+  "penzeszk": [
+    {"nev": "Devizaszámla", "osszeg": 0},
+    {"nev": "HUF bankszámla", "osszeg": 0},
+    {"nev": "Pénztár", "osszeg": 0},
+    {"nev": "Egyéb", "osszeg": 0}
+  ],
+  "hipa_telephelyek": [
+    {"nev": "Telephely neve", "kotelezettseg": 0, "eloleleg": 0, "egyenleg": 0}
+  ],
+  "szoveg": {
+    "osszesito": "2-3 tárgyilagos mondat az év számairól. Konkrét összegek és arányok.",
+    "bevetelek": "A bevételek összetételének tárgyilagos leírása — mi az alaptevékenység, van-e egyéb bevétel, támogatás.",
+    "arfolyam": "Ha volt árfolyamhatás, annak tárgyilagos ismertetése. Ha nem volt, hagyd üresen.",
+    "koltsegek": "A legnagyobb kiadástételek tárgyilagos ismertetése és definíciója.",
+    "berzkoltseg": "A személyi jellegű kiadások összetételének tárgyilagos leírása.",
+    "penz_helyzet": "A pénzeszközök és a vevő/szállító egyenleg tárgyilagos ismertetése számokkal.",
+    "liq_reszlet": "A likviditási ráta értéke és definíciója (forgóeszköz / rövid lej. kötelezettség).",
+    "kiva_magyarazat": "A KIVA mechanizmusának tárgyilagos leírása: mi az adóalap, mi a kulcs, mit vált ki.",
+    "hipa_magyarazat": "A HIPA számításának tárgyilagos leírása: alap = KIVA-alap × 1,2, önkormányzatonként eltérő kulcs.",
+    "ado_osszegzes": "Az összes adóteher arányának tárgyilagos közlése a bevételhez képest."
+  }
+}`;
+}
+
+function fmtM(v) {
+  if (!v || isNaN(v)) return '—';
+  const m = v / 1000000;
+  if (Math.abs(m) >= 1000) return (m/1000).toLocaleString('hu-HU', {maximumFractionDigits:2}) + ' Mrd Ft';
+  return m.toLocaleString('hu-HU', {maximumFractionDigits:1}) + ' M Ft';
+}
+
+function pct(a, b) {
+  if (!b || !a) return '—';
+  return Math.round(a / b * 100) + '%';
+}
+
+function renderReport(d) {
+  const k = d.kpi || {};
+  const s = d.szoveg || {};
+  const koltsegek = (d.koltsegek || []).filter(c => c.osszeg > 0).sort((a,b) => b.osszeg - a.osszeg);
+  const penzek = (d.penzeszk || []).filter(p => p.osszeg > 0);
+  const hipa = d.hipa_telephelyek || [];
+  const maxK = koltsegek[0]?.osszeg || 1;
+  const kColors = ['#D85A30','#E24B4A','#BA7517','#EF9F27','#534AB7','#888780','#B4B2A9'];
+  const marzs = k.arbevetal > 0 ? Math.round(k.eredmeny / k.arbevetal * 100) : 0;
+  const today = new Date().toLocaleDateString('hu-HU', {year:'numeric',month:'long',day:'numeric'});
+
+  const koltBars = koltsegek.map((c,i) => `
+    <div class="cr-row">
+      <span class="cr-row-lbl">${c.nev}</span>
+      <span class="cr-row-val">${fmtM(c.osszeg)}</span>
+      <div class="cr-bw"><div class="cr-bf" style="width:${Math.round(c.osszeg/maxK*100)}%;background:${kColors[i%kColors.length]}"></div></div>
+    </div>`).join('');
+
+  const hipaTelephelyek = hipa.length ? hipa.map(h => `
+    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — kivetett kötelezettség</span><span class="ado-row-val">${fmtM(h.kotelezettseg)}</span></div>
+    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — befizetett előleg</span><span class="ado-row-val fizetve">${fmtM(h.eloleleg)}</span></div>
+    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — fennálló egyenleg</span><span class="ado-row-val esedek">${fmtM(h.egyenleg)}</span></div>`).join('') : '';
+
+  const hipaCards = hipa.length ? `<div class="hipa-grid">${hipa.map(h => `
+    <div class="hipa-card">
+      <div class="hipa-lbl">${h.nev}</div>
+      <div class="hipa-val">${fmtM(h.egyenleg)}</div>
+      <div class="hipa-sub">fennálló egyenleg</div>
+    </div>`).join('')}</div>` : '';
+
+  const kivaAlap = k.kiva_alap || 0;
+  const hipaAlap = Math.round(kivaAlap * 1.2);
+
+  const html = `<div class="cr-wrap">
+  <div class="cr-hdr">
+    <div class="cr-hdr-top">
+      <div>
+        <div class="cr-brand">SukorADÓ · Ügyfél-összefoglaló</div>
+        <div class="cr-cegnev">${d.ceg || '—'}</div>
+        <div class="cr-meta">${d.adoszam ? 'Adószám: ' + d.adoszam + ' · ' : ''}Elkészítve: ${today}</div>
+      </div>
+      <div class="cr-period">
+        <div class="cr-period-lbl">Vizsgált időszak</div>
+        <div class="cr-period-val">${d.idoszak || '—'}</div>
+      </div>
+    </div>
+    <div class="cr-kpi-row">
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Éves bevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">értékesítés + egyéb</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési cost</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Eredmény</div><div class="cr-kpi-val">${fmtM(k.eredmeny)}</div><div class="cr-kpi-sub ${k.eredmeny>=0?'pos':'neg'}">${marzs}% marzs</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA + HIPA + egyéb</div></div>
+    </div>
+  </div>
+
+  <div class="cr-tabs">
+    <button class="cr-tab on" onclick="crTab('c1',this)">Az év röviden</button>
+    <button class="cr-tab" onclick="crTab('c2',this)">Eredmény</button>
+    <button class="cr-tab" onclick="crTab('c3',this)">Kiadások</button>
+    <button class="cr-tab" onclick="crTab('c4',this)">Pénzügyi helyzet</button>
+    <button class="cr-tab ado" onclick="crTab('c5',this)">Adók részletesen</button>
+  </div>
+
+  <div id="c1" class="cr-sec on">
+    <div class="cr-sec-title"><span class="cr-sec-num">1</span>Az év röviden</div>
+    <div class="ins info">${s.osszesito || '—'}</div>
+    <div class="ins info">${s.bevetelek || '—'}</div>
+    <div class="cg">
+      <div class="cb"><div class="cb-title">Bevétel és kiadás</div><div class="cb-sub">Az éves pénzforgalom főbb tételei</div><div style="position:relative;height:200px"><canvas id="cv1"></canvas></div></div>
+      <div class="cb"><div class="cb-title">Bevétel → Kiadás → Eredmény</div><div class="cb-sub">Hogyan keletkezett a nyereség?</div><div style="position:relative;height:200px"><canvas id="cv2"></canvas></div></div>
+    </div>
+  </div>
+
+  <div id="c2" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num">2</span>Eredmény és bevételek</div>
+    <div class="mc-row">
+      <div class="mc"><div class="mc-lbl">Értékesítés árbevétele</div><div class="mc-val pos">${fmtM(k.arbevetal)}</div></div>
+      <div class="mc"><div class="mc-lbl">Egyéb bevételek</div><div class="mc-val pos">${fmtM(k.egyeb_bevetel)}</div><div class="mc-sub">támogatás, kártérítés</div></div>
+      <div class="mc"><div class="mc-lbl">Adózás előtti eredmény</div><div class="mc-val ${k.eredmeny>=0?'pos':'neg'}">${fmtM(k.eredmeny)}</div><div class="mc-sub">${marzs}% a bevételből</div></div>
+      <div class="mc"><div class="mc-lbl">KIVA-ráfordítás</div><div class="mc-val neg">${fmtM(k.kiva_osszeg)}</div></div>
+    </div>
+    <div class="ins info">${s.bevetelek || '—'}</div>
+    ${s.arfolyam ? `<div class="ins info">${s.arfolyam}</div>` : ''}
+  </div>
+
+  <div id="c3" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num">3</span>Kiadások részletezve</div>
+    <div class="ins info">${s.koltsegek || '—'}</div>
+    <div class="ins info">${s.berzkoltseg || '—'}</div>
+    <div class="cg">
+      <div class="cb"><div class="cb-title">Kiadások megoszlása</div><div class="cb-sub">Arányos megjelenítés</div><div style="position:relative;height:210px"><canvas id="cv3"></canvas></div></div>
+      <div class="cb"><div class="cb-title">Kiadástételek</div><div class="cb-sub">Összegek és arányok</div>${koltBars}</div>
+    </div>
+  </div>
+
+  <div id="c4" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num">4</span>Pénzügyi helyzet</div>
+    <div class="mc-row">
+      <div class="mc"><div class="mc-lbl">Összes pénzeszköz</div><div class="mc-val pos">${fmtM(k.penzeszkoz)}</div></div>
+      <div class="mc"><div class="mc-lbl">Vevőkövetelés</div><div class="mc-val">${fmtM(k.vevo_kovetel)}</div><div class="mc-sub">beérkező összeg</div></div>
+      <div class="mc"><div class="mc-lbl">Szállítói tartozás</div><div class="mc-val neg">${fmtM(k.szallito_tar)}</div><div class="mc-sub">fizetendő összeg</div></div>
+      <div class="mc"><div class="mc-lbl">NAV-tartozás</div><div class="mc-val neg">${fmtM(k.nav_tartozas)}</div></div>
+    </div>
+    <div class="ins info">${s.penz_helyzet || '—'}</div>
+    <div class="ins info">${s.liq_reszlet || '—'}</div>
+    <div class="cg">
+      <div class="cb"><div class="cb-title">Pénzeszközök megoszlása</div><div class="cb-sub">Hol van a cég pénze?</div><div style="position:relative;height:200px"><canvas id="cv4"></canvas></div></div>
+      <div class="cb"><div class="cb-title">Kinnlevőségek és tartozások</div><div class="cb-sub">Összehasonlítás</div>
+        <div class="lb-row" style="margin-top:8px">
+          <div class="lb-head"><span>Vevőkövetelések</span><span style="color:#14917F;font-weight:500">${fmtM(k.vevo_kovetel)}</span></div>
+          <div class="lb-track"><div class="lb-fill" style="width:100%;background:#14917F"></div></div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-head"><span>Szállítói tartozás</span><span style="color:#D85A30;font-weight:500">${fmtM(k.szallito_tar)}</span></div>
+          <div class="lb-track"><div class="lb-fill" style="width:${k.vevo_kovetel>0?Math.min(100,Math.round(k.szallito_tar/k.vevo_kovetel*100)):50}%;background:#D85A30"></div></div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-head"><span>Rendelkezésre álló pénz</span><span style="color:#A67C52;font-weight:500">${fmtM(k.penzeszkoz)}</span></div>
+          <div class="lb-track"><div class="lb-fill" style="width:${k.vevo_kovetel>0?Math.min(100,Math.round(k.penzeszkoz/k.vevo_kovetel*100)):30}%;background:#A67C52"></div></div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-head"><span>NAV-adótartozás</span><span style="color:#534AB7;font-weight:500">${fmtM(k.nav_tartozas)}</span></div>
+          <div class="lb-track"><div class="lb-fill" style="width:${k.vevo_kovetel>0?Math.min(100,Math.round(k.nav_tartozas/k.vevo_kovetel*100)):10}%;background:#534AB7"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="c5" class="cr-sec">
+    <div class="cr-sec-title"><span class="cr-sec-num ado">5</span>Adók részletesen</div>
+    <div class="ins purple">Az év során a cég összesen <b>${fmtM(k.osszes_ado)}</b> adót fizetett különböző jogcímeken — ez a bevétel ${pct(k.osszes_ado, k.arbevetal)}-a. Az alábbiakban ez tételesen szerepel.</div>
+
+    <div class="ado-card">
+      <div class="ado-card-title">KIVA — Kisvállalati adó <span class="ado-badge">Nyereség- és béralapú adó</span></div>
+      <div class="ado-card-sub">A cég KIVA-alany — ez egy összevont adónem kkv-k számára</div>
+      <div class="kiva-calc">
+        <div class="kiva-calc-title">A KIVA kiszámítása</div>
+        <div class="kiva-sor"><span>KIVA-alap (személyi kifizetések + tőkekivonás)</span><span>${fmtM(kivaAlap)}</span></div>
+        <div class="kiva-sor"><span>KIVA kulcs</span><span>10%</span></div>
+        <div class="kiva-sor"><span>Könyvelésben elszámolt KIVA-ráfordítás</span><span>${fmtM(k.kiva_osszeg)}</span></div>
+      </div>
+      <div class="ins purple" style="margin-bottom:0">${s.kiva_magyarazat || '—'}</div>
+    </div>
+
+    <div class="ado-card">
+      <div class="ado-card-title">Helyi iparűzési adó (HIPA) <span class="ado-badge">Önkormányzati adó</span></div>
+      <div class="ado-card-sub">Az adó alapja a KIVA-alap 120%-a, az adókulcsot az önkormányzat határozza meg</div>
+      ${hipaCards}
+      <div class="kiva-calc">
+        <div class="kiva-calc-title">A HIPA alapjának levezetése</div>
+        <div class="kiva-sor"><span>KIVA-alap</span><span>${fmtM(kivaAlap)}</span></div>
+        <div class="kiva-sor"><span>HIPA-alap (KIVA-alap × 1,2)</span><span>${fmtM(hipaAlap)}</span></div>
+        <div class="kiva-sor"><span>Adókulcs (önkormányzatonként eltérő)</span><span>lásd telephely</span></div>
+      </div>
+      ${hipaTelephelyek ? `<div style="margin-bottom:.75rem">${hipaTelephelyek}</div>` : ''}
+      <div class="ins purple" style="margin-bottom:0">${s.hipa_magyarazat || '—'}</div>
+    </div>
+
+    <div class="ado-card">
+      <div class="ado-card-title">Adóteher összesítő</div>
+      <div class="ado-row"><span class="ado-row-lbl">KIVA</span><span class="ado-row-val">${fmtM(k.kiva_osszeg)}</span></div>
+      <div class="ado-row"><span class="ado-row-lbl">Helyi iparűzési adó (HIPA)</span><span class="ado-row-val">${fmtM(k.hipa_osszeg)}</span></div>
+      <div class="ado-row"><span class="ado-row-lbl">NAV felé fennálló egyenleg</span><span class="ado-row-val esedek">${fmtM(k.nav_tartozas)}</span></div>
+      <div class="ado-total"><span class="ado-total-lbl">Összes adóteher</span><span class="ado-total-val">${fmtM(k.osszes_ado)}</span></div>
+      <div class="ins purple" style="margin-top:1rem;margin-bottom:0">${s.ado_osszegzes || '—'}</div>
+    </div>
+
+    <div class="zarszó">Ez az összefoglaló a főkönyvi kivonat adatain alapul, és tájékoztató jellegű. Az adózással kapcsolatos döntésekhez kérjük, egyeztessen könyvelőjével.<br><br><b>— SukorADÓ csapata</b></div>
+  </div>
+
+  <div class="cr-ftr">
+    <div class="cr-ftr-brand">Sukor<span>ADÓ</span> · Könyvelés &amp; Adótanácsadás</div>
+    <div class="cr-ftr-note">Ez az összefoglaló tájékoztató jellegű, és nem helyettesíti a könyvelői konzultációt. · ${today}</div>
+  </div>
+</div>`;
+
+  document.getElementById('client-preview').innerHTML = html;
+
+  requestAnimationFrame(() => {
+    const gc = 'rgba(107,62,38,.1)';
+    function tryC(id, cfg) { const el = document.getElementById(id); if(el) new Chart(el, cfg); }
+    const barOpts = (labels, data, colors) => ({
+      type: 'bar',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 7, borderSkipped: false }] },
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtM(c.raw)}}},
+        scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}
+      }
+    });
+    tryC('cv1', barOpts(['Árbevétel','Kiadás'],[k.arbevetal,k.oszes_kiad],['#14917F','#D85A30']));
+    tryC('cv2', barOpts(['Bevétel','Kiadás','Eredmény'],[k.arbevetal,k.oszes_kiad,k.eredmeny],['#14917F','#D85A30',k.eredmeny>=0?'#0D5C54':'#A32D2D']));
+    if (koltsegek.length) tryC('cv3', {
+      type: 'doughnut',
+      data: { labels: koltsegek.map(c=>c.nev), datasets: [{ data: koltsegek.map(c=>c.osszeg), backgroundColor: kColors, borderWidth: 0 }] },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'54%',
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.raw)}}}
+      }
+    });
+    if (penzek.length) tryC('cv4', {
+      type: 'doughnut',
+      data: { labels: penzek.map(p=>p.nev), datasets: [{ data: penzek.map(p=>p.osszeg), backgroundColor: ['#14917F','#1DB399','#5ECBB8','#A0DDD4'], borderWidth: 0 }] },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'58%',
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.raw)}}}
+      }
+    });
+  });
+}
+
+function crTab(id, btn) {
+  document.querySelectorAll('.cr-sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.cr-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function downloadHTML() {
+  if (!currentData) return;
+  const preview = document.getElementById('client-preview').innerHTML;
+  const ceg = (currentData.ceg || 'ugyfel').replace(/[^a-zA-Z0-9\u00C0-\u017E ]/g,'').trim().replace(/ +/g,'_');
+  const sc = 'script';
+  const dataStr = JSON.stringify(currentData);
+
+  const parts = [
+    '<!DOCTYPE html><html lang="hu"><head>',
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    '<title>SukorADÓ · ' + (currentData.ceg||'Összefoglaló') + '</title>',
+    '<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">',
+    '<' + sc + ' src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></' + sc + '>',
+    '<style>',
+    // Minimal inline styles for standalone file
+    ':root{--br9:#2C1810;--br8:#4A2C1A;--br7:#6B3E26;--br6:#8B5E3C;--br5:#A67C52;--br4:#C49A6C;--br3:#D4B896;--br2:#E8D5C0;--br1:#F5EDE3;--br0:#FAF6F1;--tl7:#0D5C54;--tl6:#0F7268;--tl5:#14917F;--tl4:#1DB399;--tl3:#5ECBB8;--tl2:#A0DDD4;--tx:#1A0F08;--txm:#5C3D25;--txs:#9B7355;--bd:#D4B896;--bdl:#EAD9C8}',
+    "*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);padding:2rem 1.5rem;max-width:900px;margin:0 auto}",
+    ".cr-wrap{font-family:'DM Sans',sans-serif;color:var(--tx)}",
+    '.cr-hdr{background:linear-gradient(135deg,var(--br9) 0%,var(--br8) 55%,var(--br7) 100%);border-radius:18px;padding:2.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden}',
+    ".cr-hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(20,145,127,.12)}",
+    '.cr-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;position:relative}',
+    ".cr-brand{font-family:'Lora',serif;font-size:12px;color:var(--br4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}",
+    ".cr-cegnev{font-family:'Lora',serif;font-size:22px;font-weight:600;color:#fff;line-height:1.2}.cr-meta{font-size:12px;color:var(--br4);margin-top:5px}",
+    '.cr-period{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:.65rem 1.1rem;text-align:right;flex-shrink:0}',
+    '.cr-period-lbl{font-size:10px;color:var(--br4);letter-spacing:.06em;text-transform:uppercase}.cr-period-val{font-size:14px;font-weight:500;color:#fff;margin-top:3px}',
+    '.cr-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}',
+    '.cr-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.85rem 1rem}',
+    '.cr-kpi-lbl{font-size:10px;color:var(--br4);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}.cr-kpi-val{font-size:18px;font-weight:500;color:#fff;line-height:1}.cr-kpi-sub{font-size:11px;margin-top:4px}.cr-kpi-sub.pos{color:#5ECBB8}.cr-kpi-sub.neg{color:#F0997B}.cr-kpi-sub.neu{color:var(--br3)}',
+    '.cr-tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}',
+    ".cr-tab{padding:7px 16px;border-radius:100px;border:1px solid var(--bdl);font-size:13px;cursor:pointer;background:transparent;color:var(--txs);font-family:'DM Sans',sans-serif;transition:all .15s}",
+    '.cr-tab:hover{background:var(--br1)}.cr-tab.on{background:var(--br8);color:var(--br1);border-color:var(--br8)}.cr-tab.ado{border-color:#534AB7;color:#534AB7}.cr-tab.ado.on{background:#534AB7;color:#fff}',
+    '.cr-sec{display:none}.cr-sec.on{display:block}',
+    ".cr-sec-title{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--br8);margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:2px solid var(--br2);display:flex;align-items:center;gap:9px}",
+    '.cr-sec-num{width:26px;height:26px;background:var(--br7);color:var(--br1);border-radius:50%;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}.cr-sec-num.ado{background:#534AB7}',
+    '.ins{border-radius:10px;padding:.9rem 1.15rem;margin-bottom:.8rem;font-size:13.5px;line-height:1.75;border-left:3px solid}.ins b{font-weight:500}',
+    '.ins.ok{background:#EEF9F7;color:#0D5C54;border-color:#14917F}.ins.warn{background:#FAEEDA;color:#5C3300;border-color:#EF9F27}.ins.info{background:var(--br0);color:var(--br7);border-color:var(--br4)}.ins.purple{background:#EEEDFE;color:#3C3489;border-color:#7F77DD}',
+    '.mc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem}',
+    '.mc{background:var(--br1);border-radius:10px;padding:.9rem 1rem;border:1px solid var(--bdl)}.mc-lbl{font-size:11px;color:var(--txs);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}.mc-val{font-size:18px;font-weight:500;color:var(--br8)}.mc-sub{font-size:11px;color:var(--txs);margin-top:3px}.mc-val.pos{color:#0F7268}.mc-val.neg{color:#C0391B}',
+    '.cg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}@media(max-width:580px){.cg{grid-template-columns:1fr}}',
+    '.cb{background:#fff;border:1px solid var(--bdl);border-radius:12px;padding:1.2rem}.cb-title{font-size:13px;font-weight:500;color:var(--br7);margin-bottom:2px}.cb-sub{font-size:12px;color:var(--txs);margin-bottom:12px}',
+    '.cr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl);font-size:13px}.cr-row:last-child{border-bottom:none}.cr-row-lbl{flex:1;color:var(--tx)}.cr-row-val{font-weight:500;color:var(--br8);min-width:82px;text-align:right;font-variant-numeric:tabular-nums}.cr-bw{width:72px;height:5px;background:var(--br1);border-radius:3px;overflow:hidden;flex-shrink:0}.cr-bf{height:100%;border-radius:3px}',
+    '.lb-row{margin-bottom:12px}.lb-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--txm)}.lb-track{height:10px;border-radius:5px;background:var(--br1);overflow:hidden}.lb-fill{height:100%;border-radius:5px}',
+    '.ado-card{background:#fff;border:1px solid #CECBF6;border-radius:14px;padding:1.4rem;margin-bottom:1rem}.ado-card-title{font-family:\'Lora\',serif;font-size:15px;font-weight:600;color:#3C3489;margin-bottom:.3rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ado-badge{display:inline-block;background:#EEEDFE;color:#534AB7;font-size:11px;font-weight:500;padding:2px 9px;border-radius:100px}.ado-card-sub{font-size:12px;color:#7F77DD;margin-bottom:1rem}',
+    '.ado-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EEEDFE;font-size:13px}.ado-row:last-child{border-bottom:none}.ado-row-lbl{color:var(--txm)}.ado-row-val{font-weight:500;color:#3C3489;font-variant-numeric:tabular-nums}.ado-row-val.fizetve{color:#0F7268}.ado-row-val.esedek{color:#C0391B}',
+    '.ado-total{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:2px solid #CECBF6;font-size:14px;font-weight:500}.ado-total-lbl{color:#3C3489}.ado-total-val{font-size:16px;color:#3C3489}',
+    '.hipa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}.hipa-card{background:#EEEDFE;border:1px solid #CECBF6;border-radius:10px;padding:.9rem 1rem}.hipa-lbl{font-size:11px;color:#7F77DD;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}.hipa-val{font-size:17px;font-weight:500;color:#3C3489}.hipa-sub{font-size:11px;color:#7F77DD;margin-top:3px}',
+    ".kiva-calc{background:#F8F8FE;border:1px solid #CECBF6;border-radius:12px;padding:1.2rem;margin-bottom:1rem}.kiva-calc-title{font-size:12px;color:#7F77DD;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;font-weight:500}.kiva-sor{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #CECBF6;color:var(--txm)}.kiva-sor:last-child{border-bottom:none;font-weight:500;color:#3C3489;font-size:14px;padding-top:8px;margin-top:3px}",
+    '.zarszó{background:var(--br1);border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;font-size:13.5px;color:var(--br7);line-height:1.7;border:1px solid var(--bdl)}',
+    ".cr-ftr{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--bdl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.cr-ftr-brand{font-family:'Lora',serif;font-size:15px;color:var(--br6)}.cr-ftr-brand span{color:#0F7268}.cr-ftr-note{font-size:11px;color:var(--txs);max-width:400px;text-align:right;line-height:1.5}",
+    '@media print{.cr-tabs{display:none}.cr-sec{display:block!important}.cr-hdr,.ado-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}.ins,.mc,.cb,.ado-card{break-inside:avoid}}',
+    '</style></head><body>',
+    preview,
+    '<' + sc + '>',
+    'function crTab(id,btn){document.querySelectorAll(".cr-sec").forEach(s=>s.classList.remove("on"));document.querySelectorAll(".cr-tab").forEach(b=>b.classList.remove("on"));document.getElementById(id).classList.add("on");btn.classList.add("on");}',
+    'function fmtM(v){if(!v||isNaN(v))return"\u2014";const m=v/1000000;if(Math.abs(m)>=1000)return(m/1000).toLocaleString("hu-HU",{maximumFractionDigits:2})+" Mrd Ft";return m.toLocaleString("hu-HU",{maximumFractionDigits:1})+" M Ft";}',
+    '(function(){',
+    'var d=' + dataStr + ';',
+    'var k=d.kpi||{};',
+    'var kl=(d.koltsegek||[]).filter(c=>c.osszeg>0).sort((a,b)=>b.osszeg-a.osszeg);',
+    'var pe=(d.penzeszk||[]).filter(p=>p.osszeg>0);',
+    'var kC=["#D85A30","#E24B4A","#BA7517","#EF9F27","#534AB7","#888780","#B4B2A9"];',
+    'var gc="rgba(107,62,38,.1)";',
+    'function tryC(id,cfg){var el=document.getElementById(id);if(el)new Chart(el,cfg);}',
+    'function bOpt(labels,data,colors){return{type:"bar",data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtM(c.raw)}}},scales:{y:{ticks:{callback:v=>fmtM(v),font:{size:10}},grid:{color:gc}},x:{grid:{display:false}}}}};}',
+    'tryC("cv1",bOpt(["Árbevétel","Kiadás"],[k.arbevetal,k.oszes_kiad],["#14917F","#D85A30"]));',
+    'tryC("cv2",bOpt(["Bevétel","Kiadás","Eredmény"],[k.arbevetal,k.oszes_kiad,k.eredmeny],["#14917F","#D85A30",k.eredmeny>=0?"#0D5C54":"#A32D2D"]));',
+    'if(kl.length)tryC("cv3",{type:"doughnut",data:{labels:kl.map(c=>c.nev),datasets:[{data:kl.map(c=>c.osszeg),backgroundColor:kC,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"54%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
+    'if(pe.length)tryC("cv4",{type:"doughnut",data:{labels:pe.map(p=>p.nev),datasets:[{data:pe.map(p=>p.osszeg),backgroundColor:["#14917F","#1DB399","#5ECBB8","#A0DDD4"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,padding:5}},tooltip:{callbacks:{label:c=>c.label+": "+fmtM(c.raw)}}}}});',
+    '})();',
+    '</' + sc + '>',
+    '</body></html>'
+  ];
+
+  const blob = new Blob([parts.join('\n')], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'SukorADO_' + ceg + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetApp() {
+  currentData = null; currentFile = null; currentFilename = '';
+  document.getElementById('uz-title').textContent = 'Kattints ide a feltöltéshez';
+  document.getElementById('uz-hint').textContent = 'vagy húzd rá a fájlt';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('client-preview').innerHTML = '';
+  document.getElementById('file-input').value = '';
+  setScreen('upload');
+}
+</script>
+</body>
+</html>
