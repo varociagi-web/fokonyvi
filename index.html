@@ -222,17 +222,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--br0);color:var(--tx);min-
 
   <div class="field-box">
     <label class="field-label">Könyvelői megjegyzések <span style="font-weight:400;color:var(--txs)">(nem kötelező)</span></label>
-    <textarea class="field-input" id="notes" rows="5" placeholder="Kétféle információt írhatsz ide:
-
-1. Kontextus, amit a főkönyvből nem látok:
-   • Az egyéb bevétel GINOP pályázatból származik
-   • A 30 M Ft kölcsönt a tulajdonos kapta, visszafizetés 2026 Q1-ben várható
-   • A magas házipénztár az ügyfél kérésére, készpénzes forgalom miatt szükséges
-
-2. Az ügyfél pénzügyi ismeretei / stílus:
-   • Az ügyfél pénzügyileg képzett, szakmai fogalmak használhatók
-   • Az ügyfél nem ért a pénzügyekhez, kerüljük a szakzsargont, hétköznapi példákkal magyarázz
-   • Az összefoglaló a cég tulajdonosának szól, tömör és lényegre törő legyen" style="resize:vertical;line-height:1.6;font-size:13px"></textarea>
+    <textarea class="field-input" id="notes" rows="4" placeholder="Bármilyen megjegyzés, amit az elemzésnél figyelembe kell venni. Pl. az ügyfél pénzügyi ismeretei, egy tétel háttere, különleges körülmény, stílus-elvárás…" style="resize:vertical;line-height:1.6;font-size:13px"></textarea>
     <div class="field-hint">A megjegyzések beépülnek az ügyfél-összefoglalóba, a megfelelő szakaszoknál jelennek meg.</div>
   </div>
 
@@ -394,7 +384,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function buildPrompt(notes) {
   const notesSection = notes && notes.trim()
-    ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — kötelező figyelembe venni:\n${notes.trim()}\nFontos: ha a megjegyzés az ügyfél pénzügyi ismereteire vagy a kívánt stílusra vonatkozik (pl. "szakmai fogalmak használhatók" vagy "kerüljük a szakzsargont"), azt az ÖSSZES szövegmezőre alkalmazd. Ha kontextuális információ (pl. bevétel forrása, kölcsön részletei), azt a megfelelő szakasznál építsd be tárgyilagosan.\n`
+    ? `\n\nKÖNYVELŐI MEGJEGYZÉSEK — az elemzés készítésekor ezeket teljes egészében vedd figyelembe:\n${notes.trim()}\n`
     : '';
   return `Te egy magyar könyvelő iroda (SukorADÓ) asszisztense vagy. Olvasd el a mellékelt főkönyvi kivonatot és adj vissza KIZÁRÓLAG egy valid JSON objektumot — semmi más szöveget, magyarázatot vagy markdown jelölést.${notesSection}
 
