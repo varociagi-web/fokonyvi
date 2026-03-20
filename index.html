@@ -560,7 +560,7 @@ vevo_kovetel = ${vevo} (311:${eq('311')} 312:${eq('312')} 316:${eq('316')} 317:$
 penzeszkoz = ${penz} (381:${p381} 382:${p382} bankok:${bankok} 389:${p389})
 szallito_tar = ${szall}
 hitelek_452 = ${hitel}
-hipa_osszeg = ${hipa469}
+HIPA (tájékoztatásul, NEM kerül az osszes_ado-ba — éves adó, évközi kimutatasban félrevezető): 469 egyenleg = ${hipa469}
 nav_tartozas = ${nav} (461:${eq('461')} 462:${eq('462')} 463:${eq('463')} 465:${eq('465')} 471:${eq('471')} 473:${eq('473')})
 
 NYERS BANKSZÁMLA EGYENLEGEK:
@@ -759,7 +759,7 @@ JSON STRUKTÚRA:
     "nav_tartozas": "CSAK tényleges adókötelezettségek: 461+462+463+465+471+473 számlák egyenlege összesítve — a 466 ÁFA, 467 fizetendő ÁFA, 468 ÁFA elszámolás NEM tartozik ide!",
     "kiva_osszeg": "89-es számla (KIVA) EGYENLEG TARTOZIK értéke",
     "hipa_osszeg": "469-es számlacsoport EGYENLEG TARTOZIK értéke összesítve",
-    "osszes_ado": "kiva_osszeg + hipa_osszeg"
+    "osszes_ado": "kiva_osszeg — csak a KIVA vagy TAO összege (HIPA NEM szerepel itt, az éves adó és félrevezető lenne évközi kimutatásban)"
   },
   "elozoidoszak": null,
   "valtozas": null,
@@ -1382,17 +1382,12 @@ function renderReport(d) {
       <div class="cr-bw"><div class="cr-bf" style="width:${Math.round(c.osszeg/maxK*100)}%;background:${kColors[i%kColors.length]}"></div></div>
     </div>`).join('');
 
-  const hipaTelephelyek = hipa.length ? hipa.map(h => `
-    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — kivetett kötelezettség</span><span class="ado-row-val">${fmtM(h.kotelezettseg)}</span></div>
-    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — befizetett előleg</span><span class="ado-row-val fizetve">${fmtM(h.eloleleg)}</span></div>
-    <div class="ado-row"><span class="ado-row-lbl">${h.nev} — fennálló egyenleg</span><span class="ado-row-val esedek">${fmtM(h.egyenleg)}</span></div>`).join('') : '';
-
-  const hipaCards = hipa.length ? `<div class="hipa-grid">${hipa.map(h => `
-    <div class="hipa-card">
-      <div class="hipa-lbl">${h.nev}</div>
-      <div class="hipa-val">${fmtM(h.egyenleg)}</div>
-      <div class="hipa-sub">fennálló egyenleg</div>
-    </div>`).join('')}</div>` : '';
+  const hipaTelephelyek = '';  // HIPA egyenlegek nem kerülnek megjelenítésre (éves adó, évközi kimutatásban félrevezető)
+  const hipaCards = hipa.length ? `<div class="ins purple" style="margin-bottom:.5rem">
+    A helyi iparűzési adó éves adónem — esedékessége március 15. és szeptember 15.
+    A 469-es számlán látható egyenleg az éves kötelezettség előírása, nem az időszakra arányosított tényleges teher.
+    ${hipa.map(h => `${h.nev}: ${fmtM(h.kotelezettseg)} kivetett összeg.`).join(' ')}
+  </div>` : '';
 
   const compRow = hasPrev && valtozas ? `
   <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.85rem 1rem;margin-top:10px">
@@ -1422,7 +1417,7 @@ function renderReport(d) {
       <div class="cr-kpi"><div class="cr-kpi-lbl">Árbevétel</div><div class="cr-kpi-val">${fmtM(k.arbevetal)}</div><div class="cr-kpi-sub neu">alaptevékenység</div></div>
       <div class="cr-kpi"><div class="cr-kpi-lbl">Kiadás</div><div class="cr-kpi-val">${fmtM(k.oszes_kiad)}</div><div class="cr-kpi-sub neg">működési + ráfordítás</div></div>
       <div class="cr-kpi"><div class="cr-kpi-lbl">Eredmény</div><div class="cr-kpi-val">${fmtM(k.eredmeny)}</div><div class="cr-kpi-sub ${k.eredmeny>=0?'pos':'neg'}">${marzs}% marzs</div></div>
-      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA/TAO + HIPA + egyéb</div></div>
+      <div class="cr-kpi"><div class="cr-kpi-lbl">Összes adóteher</div><div class="cr-kpi-val">${fmtM(k.osszes_ado)}</div><div class="cr-kpi-sub neg">KIVA / TAO</div></div>
     </div>
     ${compRow}
   </div>
@@ -1453,7 +1448,7 @@ function renderReport(d) {
       <div class="mc"><div class="mc-lbl">Értékesítés árbevétele</div><div class="mc-val pos">${fmtM(k.arbevetal)}</div></div>
       <div class="mc"><div class="mc-lbl">Egyéb bevételek</div><div class="mc-val ${k.egyeb_bevetel>0?'pos':''}">${fmtM(k.egyeb_bevetel)||'—'}</div><div class="mc-sub">egyéb + pénzügyi</div></div>
       <div class="mc"><div class="mc-lbl">Adózás előtti eredmény</div><div class="mc-val ${k.eredmeny>=0?'pos':'neg'}">${fmtM(k.eredmeny)}</div><div class="mc-sub">${marzs}% a bevételből</div></div>
-      <div class="mc"><div class="mc-lbl">Adóterhelés</div><div class="mc-val neg">${fmtM(k.osszes_ado)}</div><div class="mc-sub">${d.adoalany_tipusa || 'KIVA'} + HIPA</div></div>
+      <div class="mc"><div class="mc-lbl">Adóterhelés</div><div class="mc-val neg">${fmtM(k.osszes_ado)}</div><div class="mc-sub">${d.adoalany_tipusa || 'KIVA'}</div></div>
     </div>
     <div class="ins info">${s.bevetelek || '—'}</div>
     ${s.arfolyam ? `<div class="ins info">${s.arfolyam}</div>` : ''}
@@ -1524,10 +1519,8 @@ function renderReport(d) {
     <div class="ado-card">
       <div class="ado-card-title">Adóteher összesítő</div>
       <div class="ado-row"><span class="ado-row-lbl">KIVA</span><span class="ado-row-val">${fmtM(k.kiva_osszeg)}</span></div>
-      <div class="ado-row"><span class="ado-row-lbl">Helyi iparűzési adó (HIPA)</span><span class="ado-row-val">${fmtM(k.hipa_osszeg)}</span></div>
-      <div class="ado-row"><span class="ado-row-lbl">NAV felé fennálló egyenleg</span><span class="ado-row-val esedek">${fmtM(k.nav_tartozas)}</span></div>
-      <div class="ado-total"><span class="ado-total-lbl">Összes adóteher</span><span class="ado-total-val">${fmtM(k.osszes_ado)}</span></div>
-      <div class="ins purple" style="margin-top:1rem;margin-bottom:0">${s.ado_osszegzes || '—'}</div>
+      <div class="ado-row"><span class="ado-row-lbl">Összes adóteher (KIVA/TAO)</span><span class="ado-row-val">${fmtM(k.osszes_ado)}</span></div>
+      <div class="ins purple" style="margin-top:.75rem;margin-bottom:0">${s.ado_osszegzes || '—'}</div>
     </div>
 
     <div class="zarszó">Ez az összefoglaló a főkönyvi kivonat adatain alapul, és tájékoztató jellegű. Az adózással kapcsolatos döntésekhez kérjük, egyeztessen könyvelőjével.<br><br><b>— SukorADÓ csapata</b></div>
